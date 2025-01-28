@@ -23,19 +23,19 @@ void displayRecord(const ParkingRecord& record) {
 int main() {
     ParkingSystem system(3);
     
-    std::vector<std::string> mainMenuOptions = {
-        "Add Owner",
-        "Add Vehicle",
-        "Register Entry",
-        "Register Exit",
-        "Display All Owners",
-        "Display All Vehicles",
-        "Display All Records",
-        "Advanced Search",
-        "Exit"
-    };
+std::vector<std::string> mainMenuOptions = {
+    "\033[1;33mAdd Owner\033[0m",            
+    "\033[1;33mAdd Vehicle\033[0m",         
+    "\033[1;33mRegister Entry\033[0m",      
+    "\033[1;33mRegister Exit\033[0m",       
+    "\033[1;33mDisplay All Owners\033[0m", 
+    "\033[1;33mDisplay All Vehicles\033[0m",
+    "\033[1;33mDisplay All Records\033[0m", 
+    "\033[1;33mAdvanced Search\033[0m",     
+    "\033[1;33mExit\033[0m"                 
+};
     
-    InteractiveMenu mainMenu(mainMenuOptions);
+    InteractiveMenu mainMenu(mainMenuOptions,"Parking System");
     
     while (true) {
         std::system("cls");
@@ -47,7 +47,7 @@ int main() {
                     Owner owner;
                     owner.id = Validaciones::ingresarCedula("Ingrese el número de cédula: ");
                     owner.name = Validaciones::ingresarString("Ingrese el nombre: ");
-                    owner.phone = Validaciones::ingresarCedula("Ingrese el teléfono: "); // Changed from ingresarTelefono which doesn't exist
+                    owner.phone = Validaciones::ingresarTelefono("Ingrese el teléfono: "); // Changed from ingresarTelefono which doesn't exist
                     owner.email = Validaciones::ingresarCorreo("Ingrese el correo: ");
     
                     if (Owner::isValid(owner)) {
@@ -108,15 +108,15 @@ int main() {
                     break;
                 case 7: { // Advanced Search
                     std::vector<std::string> searchOptions = {
-                        "Search by Owner Name",
-                        "Search by Vehicle Criteria",
-                        "Search by Time Range",
-                        "Search by Location",
-                        "Search by Plate and Date",
-                        "Back to Main Menu"
+                        "\033[1;33mSearch by Owner Name\033[0m",
+                        "\033[1;33mSearch by Vehicle Criteria\033[0m",
+                        "\033[1;33mSearch by Time Range\033[0m",
+                        "\033[1;33mSearch by Location\033[0m",
+                        "\033[1;33mSearch by Plate and Date\033[0m",
+                        "\033[1;33mBack to Main Menu\033[0m"
                     };
-                    
-                    int searchChoice = InteractiveMenu::showSubMenu(searchOptions);
+
+                    int searchChoice = InteractiveMenu::showSubMenu(searchOptions,"Advanced Search");
                     std::string input;
                     
                     switch (searchChoice) {
@@ -159,11 +159,12 @@ int main() {
                         }
                         case 3: { // Search by Location
                             std::vector<std::string> locationOptions = {
-                                "Near Exit",
-                                "Near Entrance",
-                                "Back"
+                                "\033[1;33mNear Exit\033[0m",
+                                "\033[1;33mNear Entrance\033[0m",
+                                "\033[1;33mBack\033[0m"
                             };
-                            int locChoice = InteractiveMenu::showSubMenu(locationOptions);
+
+                            int locChoice = InteractiveMenu::showSubMenu(locationOptions, "Search by Location");
                             if (locChoice < 2) {
                                 auto results = system.searchVehiclesByLocation(locChoice == 0);
                                 for (const auto& vehicle : results) {
