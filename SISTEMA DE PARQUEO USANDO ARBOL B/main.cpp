@@ -4,7 +4,6 @@
 #include "InteractiveMenu.h"
 #include "Validaciones.h"
 
-
 // Add missing display functions
 void displayVehicle(const Vehicle& vehicle) {
     std::cout << "Plate: " << vehicle.plate << "\n"
@@ -27,11 +26,15 @@ int main() {
         "\033[1;33mAdd Owner\033[0m",            
         "\033[1;33mAdd Vehicle\033[0m",         
         "\033[1;33mRegister Entry\033[0m",      
-        "\033[1;33mRegister Exit\033[0m",       
+        "\033[1;33mRegister Exit\033[0m", 
+        "\033[1;33mDisplay Parking Layout\033[0m",  // Nueva opción
+        "\033[1;33mFind Vehicle Location\033[0m",   // Nueva opción      
         "\033[1;33mDisplay All Owners\033[0m", 
         "\033[1;33mDisplay All Vehicles\033[0m",
         "\033[1;33mDisplay All Records\033[0m", 
-        "\033[1;33mAdvanced Search\033[0m",     
+        "\033[1;33mAdvanced Search\033[0m", 
+        "\033[1;33mUpdate Owner\033[0m",
+        "\033[1;33mDelete Records\033[0m",    
         "\033[1;33mExit\033[0m"                 
     };
     
@@ -124,7 +127,19 @@ int main() {
                     system.registerExit(plate);
                     break;
                 }
-                case 4:
+
+                case 4: { // Display Parking Layout
+                        system.displayParkingLayout();
+                        break;
+                    }   
+                case 5: { // Find Vehicle Location
+                    std::string plate;
+                    std::cout << "Enter plate number: ";
+                    std::getline(std::cin, plate);
+                    system.getVehicleLocation(plate);
+                    break;
+                    }         
+                case 6:
                     system.displayAllOwners([](const Owner& owner) {
                         std::cout << "ID: " << owner.id << "\n"
                                 << "Name: " << owner.name << "\n"
@@ -132,17 +147,17 @@ int main() {
                                 << "Email: " << owner.email << "\n\n";
                     });
                     break;
-                case 5:
+                case 7:
                     system.displayAllVehicles([](const Vehicle& vehicle) {
                         displayVehicle(vehicle);
                     });
                     break;
-                case 6:
+                case 8:
                     system.displayAllRecords([](const ParkingRecord& record) {
                         displayRecord(record);
                     });
                     break;
-                case 7: { // Advanced Search
+                case 9: { // Advanced Search
                     std::vector<std::string> searchOptions = {
                         "\033[1;33mSearch by Owner Name\033[0m",
                         "\033[1;33mSearch by Vehicle Criteria\033[0m",
@@ -229,11 +244,109 @@ int main() {
                     }
                     break;
                 }
-                case 8: // Exit
+                case 10: {
+                    std::vector<std::string> updateOptions = {
+                        "\033[1;33mUpdate Name\033[0m",
+                        "\033[1;33mUpdate Phone Number\033[0m",
+                        "\033[1;33mUpdate Email\033[0m",
+                        "\033[1;33mUpdate All Data\033[0m"
+                        "\033[1;33mBack\033[0m"
+                    };
+
+                    std::string id = Validaciones::ingresarCedula("Ingrese el numero de cedula del propietario a actualizar:");
+                    Owner* existingOwner = system.findOwner(id);
+
+                    if (!existingOwner){
+                        std::cout << "Propietario no encontrado" << std::endl;
+                        break;
+                    }
+
+                    Owner updatedOwner = *existingOwner;
+
+                    int updateChoice = InteractiveMenu::showSubMenu(updateOptions, "Update Owner");
+
+                    switch (updateChoice){
+                        case 0:{
+                            std::cout << "Nombre actual: " << existingOwner->name << std::endl;
+                            updatedOwner.name = Validaciones::ingresarString("Ingrese el nuevo nombre: ");
+                            break;
+                        }
+                        case 1:{
+                            std::cout << "Telefono actual: " << existingOwner->phone << std::endl;
+                            updatedOwner.phone = Validaciones::ingresarTelefono("Ingrese el nuevo telefono: ");
+                            break;
+                        }
+                        case 2:{
+                            std::cout << "Correo actual: " << existingOwner->email << std::endl;
+                            updatedOwner.email = Validaciones::ingresarCorreo("Ingrese el nuevo correo: ");
+                            break;
+                        }
+                        case 3:{
+                            std::cout << "Datos actuales: " << std::endl;
+                            std::cout << "Nombre: " << existingOwner->name << std::endl;
+                            std::cout << "Telefono: " << existingOwner->phone << std::endl;
+                            std::cout << "Correo: " << existingOwner->email << std::endl;
+                            updatedOwner.name = Validaciones::ingresarString("Ingrese el nuevo nombre: ");
+                            updatedOwner.phone = Validaciones::ingresarTelefono("Ingrese el nuevo telefono: ");
+                            updatedOwner.email = Validaciones::ingresarCorreo("Ingrese el nuevo correo: ");
+                            break;
+                        }
+                        case 4:{
+                            delete existingOwner;
+                            break;
+                        }
+                    }
+
+                    if(!updateChoice == 4){
+                        if(Owner::isValid(updatedOwner)){
+                            system.updateOwner(updatedOwner);
+                            std::cout << "Propietario actualizado exitosamente" << std::endl;
+                        } else {
+                            throw std::runtime_error("Datos de propietario inválidos");
+                        }
+                    };
+
+                    delete existingOwner;
+                    break;
+                }
+
+                case 11: {
+                    std::vector<std::string> deleteOptions = {
+                        "\033[1;33mDelete Owner\033[0m",
+                        "\033[1;33mDelete Vehicle\033[0m",
+                        "\033[1;33mExit\033[0m"
+                    };  
+                    int deleteChoice = InteractiveMenu::showSubMenu(deleteOptions, "Delete Records");
+                    switch (deleteChoice){
+                        case 0:{
+                            std::string id = Validaciones::ingresarCedula("Ingrese el numero de cedula del propietario a eliminar:");
+                            if(system.deleteOwner(id)){
+                                std::cout << "Propietario eliminado exitosamente" << std::endl;
+                            } else {
+                                std::cout << "Propietario no encontrado" << std::endl;
+                            }
+                            break;
+                        }
+                        case 1:{
+                            std::string plate;
+                            std::cout << "Ingrese la placa del vehiculo a eliminar: ";
+                            std::getline(std::cin, plate);
+                            if(system.deleteVehicle(plate)){
+                                std::cout << "Vehiculo eliminado exitosamente" << std::endl;
+                            } else {
+                                std::cout << "Vehiculo no encontrado" << std::endl;
+                            }
+                            break;
+                        }
+                    }
+                    break;
+                } 
+
+                case 12: // Exit
                     return 0;
             }
-            
-            if (choice != 8) {
+        
+            if (choice != 12) {
                 std::cout << "\nPress any key to continue...";
                 _getch();
             }
@@ -245,5 +358,5 @@ int main() {
         }
     }
     
-    return 0;
+return 0;
 }

@@ -13,6 +13,7 @@ SOURCES = main.cpp \
           DataEncryption.cpp \
           InteractiveMenu.cpp \
           validaciones.cpp \
+		  ParkingVisualization.cpp\
           Models.cpp
 
 # Object files

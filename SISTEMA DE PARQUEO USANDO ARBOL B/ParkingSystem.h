@@ -3,28 +3,39 @@
 #include "Models.h"
 #include <string>
 #include <functional>
+#include "ParkingVisualization.h"
 
 class ParkingSystem {
 private:
     BTree<Owner> owners;
     BTree<Vehicle> vehicles;
     BTree<ParkingRecord> records;
+    ParkingVisualization parkingLayout;
     
     void loadData();
     void saveData() const;
-    
+    Owner* findOwnerInTree(const std::string& id) const;
+    void reloadData();
 public:
     ParkingSystem(int degree = 3);
     
+    //grafica
+    void displayParkingLayout() const;
+    void getVehicleLocation(const std::string& plate);
+
     // Operaciones de propietarios
     void addOwner(const Owner& owner);
     void removeOwner(const std::string& id);
     Owner* findOwner(const std::string& id);
-    
+    void updateOwner(const Owner& owner);
+    bool deleteOwner(const std::string& id);
+
     // Operaciones de vehículos
     void addVehicle(const Vehicle& vehicle);
     void removeVehicle(const std::string& plate);
     Vehicle* findVehicle(const std::string& plate);
+    bool deleteVehicle(const std::string& plate);
+    std::vector<Vehicle> getVehiclesByOwnerId(const std::string& ownerId);
     
     // Operaciones de registro
     void registerEntry(const std::string& plate);

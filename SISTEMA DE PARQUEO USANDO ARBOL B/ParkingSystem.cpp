@@ -5,6 +5,7 @@
 #include <iomanip>
 #include <sstream>
 #include <algorithm>
+#include <memory>
 
 ParkingSystem::ParkingSystem(int degree) : 
     owners(degree), vehicles(degree), records(degree) {
@@ -32,21 +33,47 @@ void ParkingSystem::loadData() {
     }
 }
 
+void ParkingSystem::reloadData() {
+    // Limpiar árboles existentes
+    owners = BTree<Owner>(3);
+    vehicles = BTree<Vehicle>(3);
+    records = BTree<ParkingRecord>(3);
+    loadData();
+}
+
 void ParkingSystem::saveData() const {
-    std::ofstream ownersFile("owners.txt");
-    owners.traverse([&](const Owner& owner) {
-        ownersFile << CesarCipher::encrypt(owner.toString()) << std::endl;
-    });
+    // Guardar propietarios
+    {
+        std::ofstream ownersFile("owners.txt", std::ios::trunc);
+        if (!ownersFile) {
+            throw std::runtime_error("No se pudo abrir el archivo de propietarios");
+        }
+        owners.traverse([&](const Owner& owner) {
+            ownersFile << CesarCipher::encrypt(owner.toString()) << std::endl;
+        });
+    }
     
-    std::ofstream vehiclesFile("vehicles.txt");
-    vehicles.traverse([&](const Vehicle& vehicle) {
-        vehiclesFile << CesarCipher::encrypt(vehicle.toString()) << std::endl;
-    });
+    // Guardar vehículos
+    {
+        std::ofstream vehiclesFile("vehicles.txt", std::ios::trunc);
+        if (!vehiclesFile) {
+            throw std::runtime_error("No se pudo abrir el archivo de vehículos");
+        }
+        vehicles.traverse([&](const Vehicle& vehicle) {
+            vehiclesFile << CesarCipher::encrypt(vehicle.toString()) << std::endl;
+        });
+    }
     
-    std::ofstream recordsFile("records.txt");
-    records.traverse([&](const ParkingRecord& record) {
-        recordsFile << CesarCipher::encrypt(record.toString()) << std::endl;
-    });
+    // Guardar registros
+    {
+        std::ofstream recordsFile("records.txt", std::ios::trunc);
+        if (!recordsFile) {
+            throw std::runtime_error("No se pudo abrir el archivo de registros");
+        }
+        records.traverse([&](const ParkingRecord& record) {
+            recordsFile << CesarCipher::encrypt(record.toString()) << std::endl;
+        });
+    }
 }
 
 void ParkingSystem::addOwner(const Owner& owner) {
@@ -62,15 +89,17 @@ void ParkingSystem::removeOwner(const std::string& id) {
 }
 
 Owner* ParkingSystem::findOwner(const std::string& id) {
-    Owner searchOwner;
-    searchOwner.id = id;
-    // Note: This es una simplificación. En una implementación real,
-    // necesitarías manejar la memoria de manera más segura
-    if(owners.search(searchOwner)) {
-        Owner* found = new Owner(searchOwner);
-        return found;
-    }
-    return nullptr;
+    return findOwnerInTree(id);
+}
+
+Owner* ParkingSystem::findOwnerInTree(const std::string& id) const {
+    std::unique_ptr<Owner> result;
+    owners.traverse([&](const Owner& owner) {
+        if (owner.id == id) {
+            result = std::make_unique<Owner>(owner);
+        }
+    });
+    return result ? new Owner(*result) : nullptr;
 }
 
 void ParkingSystem::addVehicle(const Vehicle& vehicle) {
@@ -100,9 +129,86 @@ Vehicle* ParkingSystem::findVehicle(const std::string& plate) {
     return nullptr;
 }
 
+void ParkingSystem::updateOwner(const Owner& owner) {
+    Owner* existing = findOwnerInTree(owner.id);
+    if (!existing) {
+        throw std::runtime_error("Propietario no encontrado");
+    }
+    delete existing;
+
+    // Eliminar el propietario existente
+    Owner searchOwner;
+    searchOwner.id = owner.id;
+    owners.remove(searchOwner);
+
+    // Insertar el nuevo propietario
+    owners.insert(owner);
+
+    // Guardar y recargar para asegurar consistencia
+    saveData();
+    reloadData();
+}
+
+bool ParkingSystem::deleteOwner(const std::string& id) {
+    Owner* existing = findOwnerInTree(id);
+    if (!existing) {
+        return false;
+    }
+    delete existing;
+
+    // Eliminar vehículos del propietario
+    auto ownerVehicles = getVehiclesByOwnerId(id);
+    for (const auto& vehicle : ownerVehicles) {
+        deleteVehicle(vehicle.plate);
+    }
+
+    // Eliminar el propietario
+    Owner searchOwner;
+    searchOwner.id = id;
+    owners.remove(searchOwner);
+
+    // Guardar y recargar para asegurar consistencia
+    saveData();
+    reloadData();
+    return true;
+}
+
+bool ParkingSystem::deleteVehicle(const std::string& plate){
+    Vehicle* existing = findVehicle(plate);
+    if (!existing) {
+        return false;
+    }
+    delete existing;
+
+    // Eliminar el vehículo
+    Vehicle searchVehicle;
+    searchVehicle.plate = plate;
+    vehicles.remove(searchVehicle);
+
+    // Guardar y recargar para asegurar consistencia
+    saveData();
+    reloadData();
+    return true;
+
+}
+
+std::vector<Vehicle> ParkingSystem::getVehiclesByOwnerId(const std::string& ownerId){
+    std::vector<Vehicle> result;
+    vehicles.traverse([&](const Vehicle& vehicle){
+        if(vehicle.ownerId == ownerId){
+            result.push_back(vehicle);
+        }
+    });
+    return result; 
+}
+
 void ParkingSystem::registerEntry(const std::string& plate) {
     if(!findVehicle(plate)) {
         throw std::runtime_error("Vehicle not found");
+    }
+    
+    if (!parkingLayout.parkVehicle(plate)) {
+        throw std::runtime_error("No parking spaces available");
     }
     
     auto now = std::chrono::system_clock::now();
@@ -118,6 +224,8 @@ void ParkingSystem::registerEntry(const std::string& plate) {
 }
 
 void ParkingSystem::registerExit(const std::string& plate) {
+    parkingLayout.removeVehicle(plate);
+    
     auto now = std::chrono::system_clock::now();
     auto timeT = std::chrono::system_clock::to_time_t(now);
     std::stringstream ss;
@@ -125,8 +233,6 @@ void ParkingSystem::registerExit(const std::string& plate) {
     
     ParkingRecord searchRecord;
     searchRecord.plate = plate;
-    // Aquí deberías buscar el registro más reciente sin tiempo de salida
-    // Esta es una simplificación
     if(records.search(searchRecord)) {
         searchRecord.exitTime = ss.str();
         records.remove(searchRecord);
@@ -145,6 +251,20 @@ void ParkingSystem::displayAllVehicles(std::function<void(const Vehicle&)> displ
 
 void ParkingSystem::displayAllRecords(std::function<void(const ParkingRecord&)> display) const {
     records.traverse(display);
+}
+
+void ParkingSystem::displayParkingLayout() const {
+    parkingLayout.display();
+}
+
+void ParkingSystem::getVehicleLocation(const std::string& plate) {
+    auto pos = parkingLayout.getVehiclePosition(plate);
+    if (pos.first != -1) {
+        std::cout << "Vehicle " << plate << " is parked at position (" 
+                 << pos.first + 1 << ", " << pos.second + 1 << ")\n";
+    } else {
+        std::cout << "Vehicle " << plate << " is not currently parked.\n";
+    }
 }
 
 std::vector<Vehicle> ParkingSystem::searchVehiclesByOwnerName(const std::string& ownerName) {
