@@ -49,29 +49,38 @@ void ParkingSystem::saveData() const {
             throw std::runtime_error("No se pudo abrir el archivo de propietarios");
         }
         owners.traverse([&](const Owner& owner) {
-            ownersFile << CesarCipher::encrypt(owner.toString()) << std::endl;
+            std::string line = owner.toString();
+            std::string encrypted = CesarCipher::encrypt(line);
+            ownersFile << encrypted << std::endl;
+            ownersFile.flush(); // Forzar la escritura
         });
     }
     
-    // Guardar vehículos
+    // Similar para vehicles.txt y records.txt
+
     {
         std::ofstream vehiclesFile("vehicles.txt", std::ios::trunc);
-        if (!vehiclesFile) {
-            throw std::runtime_error("No se pudo abrir el archivo de vehículos");
+        if(!vehiclesFile){
+            throw std::runtime_error("No se pudo abrir el archivo de vahiculos.");
         }
-        vehicles.traverse([&](const Vehicle& vehicle) {
-            vehiclesFile << CesarCipher::encrypt(vehicle.toString()) << std::endl;
+        vehicles.traverse([&](const Vehicle& vehicle){
+            std::string line = vehicle.toString();
+            std::string encrypted = CesarCipher::encrypt(line);
+            vehiclesFile << encrypted << std::endl;
+            vehiclesFile.flush();
         });
     }
-    
-    // Guardar registros
+
     {
         std::ofstream recordsFile("records.txt", std::ios::trunc);
-        if (!recordsFile) {
-            throw std::runtime_error("No se pudo abrir el archivo de registros");
+        if(!recordsFile){
+            throw std::runtime_error("No se pudo abrir el archivo de registros.");
         }
-        records.traverse([&](const ParkingRecord& record) {
-            recordsFile << CesarCipher::encrypt(record.toString()) << std::endl;
+        records.traverse([&](const ParkingRecord& record){
+            std::string line = record.toString();
+            std::string encrypted = CesarCipher::encrypt(line);
+            recordsFile << encrypted << std::endl;
+            recordsFile.flush();
         });
     }
 }
@@ -130,23 +139,31 @@ Vehicle* ParkingSystem::findVehicle(const std::string& plate) {
 }
 
 void ParkingSystem::updateOwner(const Owner& owner) {
+    // Primero verificar si el propietario existe
     Owner* existing = findOwnerInTree(owner.id);
     if (!existing) {
         throw std::runtime_error("Propietario no encontrado");
     }
     delete existing;
 
-    // Eliminar el propietario existente
-    Owner searchOwner;
-    searchOwner.id = owner.id;
-    owners.remove(searchOwner);
-
-    // Insertar el nuevo propietario
-    owners.insert(owner);
-
-    // Guardar y recargar para asegurar consistencia
+    // Crear una copia temporal de los árboles
+    BTree<Owner> tempOwners(3);
+    
+    // Copiar todos los propietarios excepto el que se va a actualizar
+    owners.traverse([&](const Owner& o) {
+        if (o.id != owner.id) {
+            tempOwners.insert(o);
+        }
+    });
+    
+    // Insertar el propietario actualizado
+    tempOwners.insert(owner);
+    
+    // Reemplazar el árbol original
+    owners = std::move(tempOwners);
+    
+    // Guardar los cambios
     saveData();
-    reloadData();
 }
 
 bool ParkingSystem::deleteOwner(const std::string& id) {

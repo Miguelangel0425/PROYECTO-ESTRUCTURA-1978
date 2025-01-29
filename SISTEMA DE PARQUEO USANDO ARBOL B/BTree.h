@@ -121,9 +121,135 @@ private:
     }
     
     void remove(BNode<T>* node, const T& key) {
-        // Implementation of remove operation
-        // This is a complex operation that requires careful handling of multiple cases
-        // For now, we'll leave it as a TODO
+        if (!node) return;
+
+        // Encuentra el índice donde la clave debería estar
+        int idx = 0;
+        while (idx < node->keys.size() && node->keys[idx] < key) 
+            idx++;
+
+        // Si la clave está en este nodo
+        if (idx < node->keys.size() && node->keys[idx] == key) {
+            if (node->isLeaf) {
+                // Caso 1: Si es una hoja, simplemente elimina la clave
+                node->keys.erase(node->keys.begin() + idx);
+            } else {
+                // Caso 2: Si no es una hoja, reemplaza con el predecesor o sucesor
+                if (node->children[idx]->keys.size() >= minDegree) {
+                    // Usa el predecesor
+                    T pred = getPred(node, idx);
+                    node->keys[idx] = pred;
+                    remove(node->children[idx], pred);
+                } else if (node->children[idx + 1]->keys.size() >= minDegree) {
+                    // Usa el sucesor
+                    T succ = getSucc(node, idx);
+                    node->keys[idx] = succ;
+                    remove(node->children[idx + 1], succ);
+                } else {
+                    // Combina los hijos y elimina la clave
+                    merge(node, idx);
+                    remove(node->children[idx], key);
+                }
+            }
+        } else {
+            if (node->isLeaf) {
+                return; // La clave no está en el árbol
+            }
+
+            // Determina si la clave está en el último hijo
+            bool flag = (idx == node->keys.size());
+
+            // Si el hijo tiene menos del mínimo de claves, rellenarlo
+            if (node->children[idx]->keys.size() < minDegree) {
+                fill(node, idx);
+            }
+
+            // Si el último hijo se ha combinado, necesitamos ir al hijo anterior
+            if (flag && idx > node->keys.size()) {
+                remove(node->children[idx - 1], key);
+            } else {
+                remove(node->children[idx], key);
+            }
+        }
+    }
+
+    T getPred(BNode<T>* node, int idx) {
+        BNode<T>* curr = node->children[idx];
+        while (!curr->isLeaf) {
+            curr = curr->children[curr->keys.size()];
+        }
+        return curr->keys[curr->keys.size() - 1];
+    }
+
+    T getSucc(BNode<T>* node, int idx) {
+        BNode<T>* curr = node->children[idx + 1];
+        while (!curr->isLeaf) {
+            curr = curr->children[0];
+        }
+        return curr->keys[0];
+    }
+
+    void fill(BNode<T>* node, int idx) {
+        if (idx != 0 && node->children[idx - 1]->keys.size() >= minDegree) {
+            borrowFromPrev(node, idx);
+        } else if (idx != node->keys.size() && node->children[idx + 1]->keys.size() >= minDegree) {
+            borrowFromNext(node, idx);
+        } else {
+            if (idx != node->keys.size()) {
+                merge(node, idx);
+            } else {
+                merge(node, idx - 1);
+            }
+        }
+    }
+
+    void borrowFromPrev(BNode<T>* node, int idx) {
+        BNode<T>* child = node->children[idx];
+        BNode<T>* sibling = node->children[idx - 1];
+
+        child->keys.insert(child->keys.begin(), node->keys[idx - 1]);
+        node->keys[idx - 1] = sibling->keys.back();
+        sibling->keys.pop_back();
+
+        if (!child->isLeaf) {
+            child->children.insert(child->children.begin(), sibling->children.back());
+            sibling->children.pop_back();
+        }
+    }
+
+    void borrowFromNext(BNode<T>* node, int idx) {
+        BNode<T>* child = node->children[idx];
+        BNode<T>* sibling = node->children[idx + 1];
+
+        child->keys.push_back(node->keys[idx]);
+        node->keys[idx] = sibling->keys.front();
+        sibling->keys.erase(sibling->keys.begin());
+
+        if (!child->isLeaf) {
+            child->children.push_back(sibling->children.front());
+            sibling->children.erase(sibling->children.begin());
+        }
+    }
+
+    void merge(BNode<T>* node, int idx) {
+        BNode<T>* child = node->children[idx];
+        BNode<T>* sibling = node->children[idx + 1];
+
+        child->keys.push_back(node->keys[idx]);
+        
+        for (const T& key : sibling->keys) {
+            child->keys.push_back(key);
+        }
+
+        if (!child->isLeaf) {
+            for (auto* ptr : sibling->children) {
+                child->children.push_back(ptr);
+            }
+        }
+
+        node->keys.erase(node->keys.begin() + idx);
+        node->children.erase(node->children.begin() + idx + 1);
+        delete sibling;
     }
     
 public:
