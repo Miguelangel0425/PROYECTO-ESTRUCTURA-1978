@@ -23,17 +23,17 @@ void displayRecord(const ParkingRecord& record) {
 int main() {
     ParkingSystem system(3);
     
-std::vector<std::string> mainMenuOptions = {
-    "\033[1;33mAdd Owner\033[0m",            
-    "\033[1;33mAdd Vehicle\033[0m",         
-    "\033[1;33mRegister Entry\033[0m",      
-    "\033[1;33mRegister Exit\033[0m",       
-    "\033[1;33mDisplay All Owners\033[0m", 
-    "\033[1;33mDisplay All Vehicles\033[0m",
-    "\033[1;33mDisplay All Records\033[0m", 
-    "\033[1;33mAdvanced Search\033[0m",     
-    "\033[1;33mExit\033[0m"                 
-};
+    std::vector<std::string> mainMenuOptions = {
+        "\033[1;33mAdd Owner\033[0m",            
+        "\033[1;33mAdd Vehicle\033[0m",         
+        "\033[1;33mRegister Entry\033[0m",      
+        "\033[1;33mRegister Exit\033[0m",       
+        "\033[1;33mDisplay All Owners\033[0m", 
+        "\033[1;33mDisplay All Vehicles\033[0m",
+        "\033[1;33mDisplay All Records\033[0m", 
+        "\033[1;33mAdvanced Search\033[0m",     
+        "\033[1;33mExit\033[0m"                 
+    };
     
     InteractiveMenu mainMenu(mainMenuOptions,"Parking System");
     
@@ -68,10 +68,46 @@ std::vector<std::string> mainMenuOptions = {
                     std::getline(std::cin, vehicle.model);
                     std::cout << "Enter color: ";
                     std::getline(std::cin, vehicle.color);
-                    std::cout << "Enter owner ID: ";
-                    std::getline(std::cin, vehicle.ownerId);
                     
-                    system.addVehicle(vehicle);
+                    while (true) {
+                        std::cout << "Enter owner ID: ";
+                        std::getline(std::cin, vehicle.ownerId);
+                        
+                        if (system.findOwner(vehicle.ownerId)) {
+                            system.addVehicle(vehicle);
+                            break;
+                        } else {
+                            std::vector<std::string> idErrorOptions = {
+                                "\033[1;33mRe-enter Owner ID\033[0m",
+                                "\033[1;33mAdd New Owner\033[0m",
+                                "\033[1;33mCancel\033[0m"
+                            };
+                            int idErrorChoice = InteractiveMenu::showSubMenu(idErrorOptions, "Invalid Owner ID");
+                            
+                            if (idErrorChoice == 0) {
+                                continue;
+                            } else if (idErrorChoice == 1) {
+                                Owner owner;
+                                owner.id = Validaciones::ingresarCedula("Ingrese el número de cédula: ");
+                                owner.name = Validaciones::ingresarString("Ingrese el nombre: ");
+                                owner.phone = Validaciones::ingresarTelefono("Ingrese el teléfono: ");
+                                owner.email = Validaciones::ingresarCorreo("Ingrese el correo: ");
+                                
+                                if (Owner::isValid(owner)) {
+                                    system.addOwner(owner);
+                                    vehicle.ownerId = owner.id;
+                                    system.addVehicle(vehicle);
+                                    break;
+                                } else {
+                                    std::cout << "Datos de propietario inválidos. Cancelando operación." << std::endl;
+                                    break;
+                                }
+                            } else {
+                                std::cout << "Operacion cancelada." << std::endl;
+                                break;
+                            }
+                        }
+                    }
                     break;
                 }
                 case 2: {
