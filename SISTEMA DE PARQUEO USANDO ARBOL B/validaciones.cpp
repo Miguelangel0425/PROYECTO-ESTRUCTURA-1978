@@ -37,6 +37,41 @@ string Validaciones::ingresarString(const string& msj) {
     return input;
 }
 
+string Validaciones::ingresarNumero(const string& msj) {
+    string input;
+    char c;
+
+    cout << msj;
+
+    while (true) {
+        c = _getch();
+
+        if (isdigit(c)) {  
+            input += c;
+            cout << c;
+        }
+        else if (c == '\b' && !input.empty()) {  
+            input.pop_back();
+            cout << "\b \b";
+        }
+        else if (c == '\r') {  
+            if (!input.empty()) {
+                break;
+            }
+            else {
+                cout << "\a";
+            }
+        }
+        else {
+            cout << "\a";  
+        }
+    }
+
+    cout << endl;
+    return input;
+}
+
+
 string Validaciones::ingresarCedula(const string& msj) {
     string cedula;
     char c;
@@ -250,12 +285,7 @@ string Validaciones::ingresarCorreo(const string& msj) {
             cout << "\b \b";
         }
         else if (c == '\r') {
-            if (validarCorreo(correo)) {
-                break;
-            }
-            else {
-                cout << "\a";
-            }
+            break;
         }
         else {
             cout << "\a";
@@ -266,27 +296,50 @@ string Validaciones::ingresarCorreo(const string& msj) {
     return correo;
 }
 
-bool Validaciones::validarCedula(const string& cedula) {
-    if (cedula.length() != 10) {
+bool Validaciones::validarCedula(const string& idInput) {
+    if ((idInput.length() != 10) || (idInput == "0000000000")) {
         return false;
     }
 
-    int suma = 0;
-    for (int i = 0; i < 9; i++) {
-        int digito = cedula[i] - '0';
-        if (i % 2 == 0) {
-            digito *= 2;
-            if (digito > 9) {
-                digito -= 9;
-            }
-        }
-        suma += digito;
+    long id = std::stol(idInput);  
+    std::vector<long> digits(10);
+    long remainder;
+    long doubledDigit;
+    long evenPositionSum = 0;
+    long oddPositionSum = 0;
+    long totalSum;
+    long checkDigit;
+
+    
+    for (int i = 9; i >= 0; --i) {
+        digits[i] = id % 10;
+        id /= 10;
     }
 
-    int ultimoDigito = cedula[9] - '0';
-    int digitoVerificador = (10 - (suma % 10)) % 10;
+    
+    for (int i = 0; i < 9; i += 2) {
+        doubledDigit = digits[i] * 2;
+        if (doubledDigit > 9) {
+            doubledDigit -= 9;
+        }
+        evenPositionSum += doubledDigit;
+    }
 
-    return ultimoDigito == digitoVerificador;
+    
+    for (int i = 1; i < 9; i += 2) {
+        oddPositionSum += digits[i];
+    }
+
+  
+    totalSum = evenPositionSum + oddPositionSum;
+    remainder = totalSum % 10;
+    checkDigit = 10 - remainder;
+    if (checkDigit == 10) {
+        checkDigit = 0;
+    }
+
+    
+    return checkDigit == digits[9];
 }
 
 bool Validaciones::validarPlaca(const string& placa) {
@@ -358,7 +411,11 @@ bool Validaciones::validarPlaca(const string& placa) {
     return false;
 
 }
-
+bool Validaciones::validarCelularEcuador(const string& numero) {
+    
+    regex patron("^09[5-9][0-9]{7}$");
+    return regex_match(numero, patron);
+}
 bool Validaciones::validarCorreo(const string& correo) {
     const regex pattern(R"((\w+)(\.{1}\w+)*@(\w+)(\.{1}\w+)+)");
     return regex_match(correo, pattern);

@@ -14,9 +14,10 @@ private:
         newNode->keys.resize(minDegree - 1);
         
         // Copy the last (t-1) keys of child to newNode
-        for(int j = 0; j < minDegree - 1; j++)
+        for(int j = 0; j < minDegree - 1; j++){
             newNode->keys[j] = child->keys[j + minDegree];
         
+        }
         // Copy the last t children of child to newNode
         if(!child->isLeaf) {
             newNode->children.resize(minDegree);

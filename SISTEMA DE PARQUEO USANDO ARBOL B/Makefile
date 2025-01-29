@@ -15,6 +15,7 @@ SOURCES = main.cpp \
           validaciones.cpp \
 		  ParkingVisualization.cpp\
           Models.cpp
+		 
 
 # Object files
 OBJECTS = $(SOURCES:%.cpp=$(OBJ_DIR)/%.o)

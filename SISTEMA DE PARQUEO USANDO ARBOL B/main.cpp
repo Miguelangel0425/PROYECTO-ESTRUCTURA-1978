@@ -48,10 +48,30 @@ int main() {
             switch (choice) {
                 case 0: {
                     Owner owner;
-                    owner.id = Validaciones::ingresarCedula("Ingrese el numero de cedula: ");
+                    Validaciones validaciones;
+                    while(!validaciones.validarCedula(owner.id)){
+                        owner.id = Validaciones::ingresarNumero("Ingrese el numero de cedula: ");
+                        if (!validaciones.validarCedula(owner.id)){
+                        std :: cout << "Cedula invalida. Ingrese nuevamente";
+                        std :: cout << endl;
+                        }
+                    }
                     owner.name = Validaciones::ingresarString("Ingrese el nombre: ");
-                    owner.phone = Validaciones::ingresarTelefono("Ingrese el telefono: "); // Changed from ingresarTelefono which doesn't exist
-                    owner.email = Validaciones::ingresarCorreo("Ingrese el correo: ");
+                    while(!validaciones.validarCelularEcuador(owner.phone)){
+                        owner.phone = Validaciones::ingresarNumero("Ingrese el telefono: "); // Changed from ingresarTelefono which doesn't exist
+                        if(!validaciones.validarCelularEcuador(owner.phone)){
+                            std :: cout << "Numero celular invalido. Ingrese nuevamente";
+                            std :: cout << endl;
+                        }
+                    }
+                    while(!validaciones.validarCorreo(owner.email)){
+                        owner.email = Validaciones::ingresarCorreo("Ingrese el correo: ");
+                        if(!validaciones.validarCorreo(owner.email)){
+                            std :: cout << "Correo invalido. Ingrese nuevamente";
+                            std :: cout << endl;
+                        }
+                    }
+                    
     
                     if (Owner::isValid(owner)) {
                         system.addOwner(owner);
@@ -63,14 +83,14 @@ int main() {
                 }
                 case 1: {
                     Vehicle vehicle;
-                    
-                    vehicle.plate = Validaciones::ingresarPlaca("Ingrese la placa del vehiculo: ");
                     Validaciones validaciones;
-                    if(!validaciones.validarPlaca(vehicle.plate)){
-                        std::cout << "Placa invalida" << std::endl;
-                        break;
-                    }
-                   
+                    while(!validaciones.validarPlaca(vehicle.plate)){
+                        vehicle.plate = Validaciones::ingresarPlaca("Ingrese la placa del vehiculo: ");
+                        if(!validaciones.validarPlaca(vehicle.plate)){
+                            std::cout << "Placa invalida. Ingrese nuevamente" << std::endl;
+                            std :: cout << endl;
+                        }
+                    }                   
                     vehicle.brand = Validaciones::ingresarString("Ingrese la marca del vehiculo: ");
                     
                     vehicle.model = Validaciones::ingresarString("Ingrese el modelo del vehiculo: ");
