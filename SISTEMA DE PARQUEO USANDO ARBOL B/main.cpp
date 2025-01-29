@@ -63,20 +63,26 @@ int main() {
                 }
                 case 1: {
                     Vehicle vehicle;
-                    std::cout << "Enter plate number: ";
-                    std::getline(std::cin, vehicle.plate);
-                    std::cout << "Enter brand: ";
-                    std::getline(std::cin, vehicle.brand);
-                    std::cout << "Enter model: ";
-                    std::getline(std::cin, vehicle.model);
-                    std::cout << "Enter color: ";
-                    std::getline(std::cin, vehicle.color);
+                    
+                    vehicle.plate = Validaciones::ingresarPlaca("Ingrese la placa del vehiculo: ");
+                    Validaciones validaciones;
+                    if(!validaciones.validarPlaca(vehicle.plate)){
+                        std::cout << "Placa inválida" << std::endl;
+                        break;
+                    }
+                   
+                    vehicle.brand = Validaciones::ingresarString("Ingrese la marca del vehiculo: ");
+                    
+                    vehicle.model = Validaciones::ingresarString("Ingrese el modelo del vehiculo: ");
+                    
+                    vehicle.color = Validaciones::ingresarString("Ingrese el color del vehiculo: ");
                     
                     while (true) {
-                        std::cout << "Enter owner ID: ";
-                        std::getline(std::cin, vehicle.ownerId);
-                        
-                        if (system.findOwner(vehicle.ownerId)) {
+                     
+                        vehicle.ownerId = Validaciones::ingresarCedula("Ingrese el numero de cedula del propietario: ");
+                        if(!validaciones.validarCedula(vehicle.ownerId)){
+                            std::cout << "Cedula inválida" << std::endl;
+                        } else if (system.findOwner(vehicle.ownerId)) {
                             system.addVehicle(vehicle);
                             break;
                         } else {

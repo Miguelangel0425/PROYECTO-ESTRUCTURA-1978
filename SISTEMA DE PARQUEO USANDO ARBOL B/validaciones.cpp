@@ -289,6 +289,76 @@ bool Validaciones::validarCedula(const string& cedula) {
     return ultimoDigito == digitoVerificador;
 }
 
+bool Validaciones::validarPlaca(const string& placa) {
+      // Códigos de provincias válidos
+    const std::vector<std::string> provinceCodes = {
+        "A", "W", "Q", "B", "G", "S", "U", "I", "P", 
+        "C", "L", "Y", "H", "R", "J", "X", "M", "K", 
+        "O", "V", "T", "E", "N", "Z"
+    };
+
+    // Códigos especiales
+    const std::vector<std::string> specialCodes = {
+        "CC", "CD", "OI", "AT", "IT"
+    };
+
+    // Convertir a mayúsculas para validación consistente
+    std::string upperPlate = placa;
+    std::transform(upperPlate.begin(), upperPlate.end(), upperPlate.begin(), ::toupper);
+
+    // Validar placas de provincias
+    if (upperPlate.length() == 6 || upperPlate.length() == 7) {
+        // Verificar si el primer código es un código de provincia válido
+        auto it = std::find(provinceCodes.begin(), provinceCodes.end(), upperPlate.substr(0, 1));
+        if (it != provinceCodes.end()) {
+            // Verificar que los siguientes 2 caracteres sean letras
+            for (int i = 1; i < 3; ++i) {
+                if (!std::isalpha(upperPlate[i])) {
+                    return false;
+                }
+            }
+            
+            // Verificar que los últimos 3-4 caracteres sean números
+            for (size_t i = 3; i < upperPlate.length(); ++i) {
+                if (!std::isdigit(upperPlate[i])) {
+                    return false;
+                }
+            }
+            return true;
+        }
+    }
+
+    // Validar placas especiales
+    if (upperPlate.length() >= 4) {
+        auto it = std::find(specialCodes.begin(), specialCodes.end(), upperPlate.substr(0, 2));
+        if (it != specialCodes.end()) {
+            // Verificar que hay números después del código especial
+            for (size_t i = 2; i < upperPlate.length(); ++i) {
+                if (!std::isdigit(upperPlate[i])) {
+                    return false;
+                }
+            }
+            return true;
+        }
+    }
+
+    // Verificar placas de internación temporal con color
+    if (upperPlate.length() >= 8) {
+        if ((upperPlate.substr(0, 2) == "IT") && 
+            (upperPlate.substr(2, 4) == "-AZUL" || upperPlate.substr(2, 4) == "-ROJO")) {
+            for (size_t i = 6; i < upperPlate.length(); ++i) {
+                if (!std::isdigit(upperPlate[i])) {
+                    return false;
+                }
+            }
+            return true;
+        }
+    }
+
+    return false;
+
+}
+
 bool Validaciones::validarCorreo(const string& correo) {
     const regex pattern(R"((\w+)(\.{1}\w+)*@(\w+)(\.{1}\w+)+)");
     return regex_match(correo, pattern);

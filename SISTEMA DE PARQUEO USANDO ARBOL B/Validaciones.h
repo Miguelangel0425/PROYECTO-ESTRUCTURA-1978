@@ -16,4 +16,5 @@ public:
     static string ingresarTelefono(const string& msj);
     static string ingresarFecha(const string& msj);
     static string ingresarHora(const string& msj);
+    bool validarPlaca(const string &placa);
 };
