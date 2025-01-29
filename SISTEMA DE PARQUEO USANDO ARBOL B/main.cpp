@@ -6,36 +6,36 @@
 
 // Add missing display functions
 void displayVehicle(const Vehicle& vehicle) {
-    std::cout << "Plate: " << vehicle.plate << "\n"
-              << "Brand: " << vehicle.brand << "\n"
-              << "Model: " << vehicle.model << "\n"
+    std::cout << "Placa: " << vehicle.plate << "\n"
+              << "Marca: " << vehicle.brand << "\n"
+              << "Modelo: " << vehicle.model << "\n"
               << "Color: " << vehicle.color << "\n"
-              << "Owner ID: " << vehicle.ownerId << "\n\n";
+              << "Cedula del propietario: " << vehicle.ownerId << "\n\n";
 }
 
 void displayRecord(const ParkingRecord& record) {
-    std::cout << "Plate: " << record.plate << "\n"
-              << "Entry Time: " << record.entryTime << "\n"
-              << "Exit Time: " << record.exitTime << "\n\n";
+    std::cout << "Placa: " << record.plate << "\n"
+              << "Tiempo de entrada: " << record.entryTime << "\n"
+              << "Tiempo dd salida: " << record.exitTime << "\n\n";
 }
 
 int main() {
     ParkingSystem system(3);
     
     std::vector<std::string> mainMenuOptions = {
-        "\033[1;33mAdd Owner\033[0m",            
-        "\033[1;33mAdd Vehicle\033[0m",         
-        "\033[1;33mRegister Entry\033[0m",      
-        "\033[1;33mRegister Exit\033[0m", 
-        "\033[1;33mDisplay Parking Layout\033[0m",  // Nueva opción
-        "\033[1;33mFind Vehicle Location\033[0m",   // Nueva opción      
-        "\033[1;33mDisplay All Owners\033[0m", 
-        "\033[1;33mDisplay All Vehicles\033[0m",
-        "\033[1;33mDisplay All Records\033[0m", 
-        "\033[1;33mAdvanced Search\033[0m", 
-        "\033[1;33mUpdate Owner\033[0m",
-        "\033[1;33mDelete Records\033[0m",    
-        "\033[1;33mExit\033[0m"                 
+        "\033[1;33mAgragar Propietario\033[0m",            
+        "\033[1;33mAgregar Vehiculo\033[0m",         
+        "\033[1;33mRegistrar Entrada\033[0m",      
+        "\033[1;33mRegistrar Salida\033[0m", 
+        "\033[1;33mGrafica del Parquedero\033[0m",  // Nueva opción
+        "\033[1;33mEncontrar ubicacion del vehiculo\033[0m",   // Nueva opción      
+        "\033[1;33mLista de Propietarios\033[0m", 
+        "\033[1;33mLista de Vehiculos\033[0m",
+        "\033[1;33mLista de Registros\033[0m", 
+        "\033[1;33mBusqueda Avanzada\033[0m", 
+        "\033[1;33mActualizacion de datos\033[0m",
+        "\033[1;33mEliminar Registros\033[0m",    
+        "\033[1;33mSalir\033[0m"                 
     };
     
     InteractiveMenu mainMenu(mainMenuOptions,"Parking System");
@@ -48,9 +48,9 @@ int main() {
             switch (choice) {
                 case 0: {
                     Owner owner;
-                    owner.id = Validaciones::ingresarCedula("Ingrese el número de cédula: ");
+                    owner.id = Validaciones::ingresarCedula("Ingrese el numero de cedula: ");
                     owner.name = Validaciones::ingresarString("Ingrese el nombre: ");
-                    owner.phone = Validaciones::ingresarTelefono("Ingrese el teléfono: "); // Changed from ingresarTelefono which doesn't exist
+                    owner.phone = Validaciones::ingresarTelefono("Ingrese el telefono: "); // Changed from ingresarTelefono which doesn't exist
                     owner.email = Validaciones::ingresarCorreo("Ingrese el correo: ");
     
                     if (Owner::isValid(owner)) {
@@ -67,7 +67,7 @@ int main() {
                     vehicle.plate = Validaciones::ingresarPlaca("Ingrese la placa del vehiculo: ");
                     Validaciones validaciones;
                     if(!validaciones.validarPlaca(vehicle.plate)){
-                        std::cout << "Placa inválida" << std::endl;
+                        std::cout << "Placa invalida" << std::endl;
                         break;
                     }
                    
@@ -81,15 +81,15 @@ int main() {
                      
                         vehicle.ownerId = Validaciones::ingresarCedula("Ingrese el numero de cedula del propietario: ");
                         if(!validaciones.validarCedula(vehicle.ownerId)){
-                            std::cout << "Cedula inválida" << std::endl;
+                            std::cout << "Cedula invalida" << std::endl;
                         } else if (system.findOwner(vehicle.ownerId)) {
                             system.addVehicle(vehicle);
                             break;
                         } else {
                             std::vector<std::string> idErrorOptions = {
-                                "\033[1;33mRe-enter Owner ID\033[0m",
-                                "\033[1;33mAdd New Owner\033[0m",
-                                "\033[1;33mCancel\033[0m"
+                                "\033[1;33mReingresar Cedula\033[0m",
+                                "\033[1;33mAgregar Nuevo Propietario\033[0m",
+                                "\033[1;33mCancelar\033[0m"
                             };
                             int idErrorChoice = InteractiveMenu::showSubMenu(idErrorOptions, "Invalid Owner ID");
                             
@@ -120,18 +120,23 @@ int main() {
                     break;
                 }
                 case 2: {
-                    std::string plate;
-                    std::cout << "Enter plate number: ";
-                    std::getline(std::cin, plate);
-                    system.registerEntry(plate);
-                    break;
+                    Vehicle vehicle;
+
+                    vehicle.plate = Validaciones::ingresarPlaca("Ingrese la placa del vehiculo: ");
+                    Validaciones validaciones;
+                    if(!validaciones.validarPlaca(vehicle.plate)){
+                        std::cout << "Placa invalida" << std::endl;
+                        break;
+                    }
                 }
                 case 3: {
-                    std::string plate;
-                    std::cout << "Enter plate number: ";
-                    std::getline(std::cin, plate);
-                    system.registerExit(plate);
-                    break;
+                Vehicle vehicle;
+                    vehicle.plate = Validaciones::ingresarPlaca("Ingrese la placa del vehiculo: ");
+                    Validaciones validaciones;
+                    if(!validaciones.validarPlaca(vehicle.plate)){
+                        std::cout << "Placa invalida" << std::endl;
+                        break;
+                    }
                 }
 
                 case 4: { // Display Parking Layout
@@ -139,18 +144,23 @@ int main() {
                         break;
                     }   
                 case 5: { // Find Vehicle Location
-                    std::string plate;
-                    std::cout << "Enter plate number: ";
-                    std::getline(std::cin, plate);
-                    system.getVehicleLocation(plate);
+                    Vehicle vehicle;
+
+                    vehicle.plate = Validaciones::ingresarPlaca("Ingrese la placa del vehiculo: ");
+                    Validaciones validaciones;
+                    if(!validaciones.validarPlaca(vehicle.plate)){
+                        std::cout << "Placa invalida" << std::endl;
+                        break;
+                    }
+                    system.getVehicleLocation(vehicle.plate);
                     break;
                     }         
                 case 6:
                     system.displayAllOwners([](const Owner& owner) {
-                        std::cout << "ID: " << owner.id << "\n"
-                                << "Name: " << owner.name << "\n"
-                                << "Phone: " << owner.phone << "\n"
-                                << "Email: " << owner.email << "\n\n";
+                        std::cout << "Cedula: " << owner.id << "\n"
+                                << "Nombre: " << owner.name << "\n"
+                                << "Telefono: " << owner.phone << "\n"
+                                << "Correo Electronico: " << owner.email << "\n\n";
                     });
                     break;
                 case 7:
@@ -165,12 +175,12 @@ int main() {
                     break;
                 case 9: { // Advanced Search
                     std::vector<std::string> searchOptions = {
-                        "\033[1;33mSearch by Owner Name\033[0m",
-                        "\033[1;33mSearch by Vehicle Criteria\033[0m",
-                        "\033[1;33mSearch by Time Range\033[0m",
-                        "\033[1;33mSearch by Location\033[0m",
-                        "\033[1;33mSearch by Plate and Date\033[0m",
-                        "\033[1;33mBack to Main Menu\033[0m"
+                        "\033[1;33mBuscar por Nombre de Usuario\033[0m",
+                        "\033[1;33mBuscar por Criterio de Vehiculo\033[0m",
+                        "\033[1;33mBuscar por Rango de Tiempo\033[0m",
+                        "\033[1;33mBuscar por Locacion\033[0m",
+                        "\033[1;33mBuscar por placa y fecha\033[0m",
+                        "\033[1;33mRegresar al Menu Principal\033[0m"
                     };
 
                     int searchChoice = InteractiveMenu::showSubMenu(searchOptions,"Advanced Search");
@@ -178,7 +188,7 @@ int main() {
                     
                     switch (searchChoice) {
                         case 0: { // Search by Owner Name
-                            std::cout << "Enter owner name: ";
+                            std::cout << "Ingrese por Nombre de Usuario: ";
                             std::getline(std::cin, input);
                             auto results = system.searchVehiclesByOwnerName(input);
                             for (const auto& vehicle : results) {
@@ -188,11 +198,11 @@ int main() {
                         }
                         case 1: { // Search by Vehicle Criteria
                             std::string brand, model, color;
-                            std::cout << "Enter brand (or press Enter to skip): ";
+                            std::cout << "Ingresar marca (or press Enter to skip): ";
                             std::getline(std::cin, brand);
-                            std::cout << "Enter model (or press Enter to skip): ";
+                            std::cout << "Ingresar modelo (or press Enter to skip): ";
                             std::getline(std::cin, model);
-                            std::cout << "Enter color (or press Enter to skip): ";
+                            std::cout << "Ingresar color (or press Enter to skip): ";
                             std::getline(std::cin, color);
                             
                             auto results = system.searchVehiclesByAllCriteria(brand, model, color);
@@ -203,9 +213,9 @@ int main() {
                         }
                         case 2: { // Search by Time Range
                             std::string startTime, endTime;
-                            std::cout << "Enter start time (YYYY-MM-DD HH:MM:SS): ";
+                            std::cout << "Ingrese tiempo de inicio (YYYY-MM-DD HH:MM:SS): ";
                             std::getline(std::cin, startTime);
-                            std::cout << "Enter end time (YYYY-MM-DD HH:MM:SS): ";
+                            std::cout << "Ingrese tiempo de fin (YYYY-MM-DD HH:MM:SS): ";
                             std::getline(std::cin, endTime);
                             
                             auto results = system.searchRecordsByTimeRange(startTime, endTime);
@@ -216,9 +226,9 @@ int main() {
                         }
                         case 3: { // Search by Location
                             std::vector<std::string> locationOptions = {
-                                "\033[1;33mNear Exit\033[0m",
-                                "\033[1;33mNear Entrance\033[0m",
-                                "\033[1;33mBack\033[0m"
+                                "\033[1;33mSalida Cercana\033[0m",
+                                "\033[1;33mEntrada Cercana\033[0m",
+                                "\033[1;33mRegresar al Menu Principal\033[0m"
                             };
 
                             int locChoice = InteractiveMenu::showSubMenu(locationOptions, "Search by Location");
@@ -232,9 +242,17 @@ int main() {
                         }
                         case 4: { // Search by Plate and Date
                             std::string plate, date;
-                            std::cout << "Enter plate number: ";
+                            Vehicle vehicle;
+
+                    vehicle.plate = Validaciones::ingresarPlaca("Ingrese la placa del vehiculo: ");
+                    Validaciones validaciones;
+                    if(!validaciones.validarPlaca(vehicle.plate)){
+                        std::cout << "Placa invalida" << std::endl;
+                        break;
+                    }
+                
                             std::getline(std::cin, plate);
-                            std::cout << "Enter date (YYYY-MM-DD): ";
+                            std::cout << "Ingrese Fecha (YYYY-MM-DD): ";
                             std::getline(std::cin, date);
                             
                             auto results = system.searchRecordsByPlateAndDate(plate, date);
@@ -252,10 +270,10 @@ int main() {
                 }
                 case 10: {
                     std::vector<std::string> updateOptions = {
-                        "\033[1;33mUpdate Name\033[0m",
-                        "\033[1;33mUpdate Phone Number\033[0m",
-                        "\033[1;33mUpdate Email\033[0m",
-                        "\033[1;33mUpdate All Data\033[0m"
+                        "\033[1;33mActualice Nombre\033[0m",
+                        "\033[1;33mActualice Numero de Telefono\033[0m",
+                        "\033[1;33mActualice Correo Electronico\033[0m",
+                        "\033[1;33mActualice Toda la Informacion\033[0m"
                         "\033[1;33mBack\033[0m"
                     };
 
@@ -318,9 +336,9 @@ int main() {
 
                 case 11: {
                     std::vector<std::string> deleteOptions = {
-                        "\033[1;33mDelete Owner\033[0m",
-                        "\033[1;33mDelete Vehicle\033[0m",
-                        "\033[1;33mExit\033[0m"
+                        "\033[1;33mEliminar Propietario\033[0m",
+                        "\033[1;33mEliminar Vehiculo\033[0m",
+                        "\033[1;33mSalir\033[0m"
                     };  
                     int deleteChoice = InteractiveMenu::showSubMenu(deleteOptions, "Delete Records");
                     switch (deleteChoice){
