@@ -99,9 +99,9 @@ int main() {
                     
                     while (true) {
                      
-                        vehicle.ownerId = Validaciones::ingresarCedula("Ingrese el numero de cedula del propietario: ");
+                        vehicle.ownerId = Validaciones::ingresarNumero("Ingrese el numero de cedula del propietario: ");
                         if(!validaciones.validarCedula(vehicle.ownerId)){
-                            std::cout << "Cedula invalida" << std::endl;
+                            std::cout << "\033[31mCedula invalida\033[0m" << std::endl;
                         } else if (system.findOwner(vehicle.ownerId)) {
                             system.addVehicle(vehicle);
                             break;
@@ -167,6 +167,8 @@ int main() {
                         std::cout << "\033[31mPlaca invalida\033[0m" << std::endl;
                         break;
                     }
+                    system.registerEntry(vehicle.plate);
+                    break;
                 }
                 case 3: {
                 Vehicle vehicle;
@@ -176,6 +178,8 @@ int main() {
                         std::cout << "\033[31mPlaca invalida\033[0m" << std::endl;
                         break;
                     }
+                    system.registerExit(vehicle.plate);
+                    break;
                 }
 
                 case 4: { // Display Parking Layout
@@ -188,7 +192,7 @@ int main() {
                     vehicle.plate = Validaciones::ingresarPlaca("Ingrese la placa del vehiculo: ");
                     Validaciones validaciones;
                     if(!validaciones.validarPlaca(vehicle.plate)){
-                        std::cout << "Placa invalida" << std::endl;
+                        std::cout << "\033[31mPlaca invalida\033[0m" << std::endl;
                         break;
                     }
                     system.getVehicleLocation(vehicle.plate);
