@@ -302,24 +302,25 @@ void ParkingSystem::registerExit(const std::string& plate) {
     std::stringstream ss;
     ss << std::put_time(std::localtime(&timeT), "%Y-%m-%d %H:%M:%S");
     
-    // Buscar el registro existente y mantener la hora de entrada
-    ParkingRecord* existingRecord = nullptr;
+    // Crear un árbol temporal para los registros actualizados
+    BTree<ParkingRecord> tempRecords(3);
+    
+    // Copiar todos los registros, actualizando el que corresponde
     records.traverse([&](const ParkingRecord& record) {
         if (record.plate == plate && record.exitTime.empty()) {
-            existingRecord = new ParkingRecord(record);
+            // Crear registro actualizado
+            ParkingRecord updatedRecord = record;
+            updatedRecord.exitTime = ss.str();
+            tempRecords.insert(updatedRecord);
+        } else {
+            // Copiar el resto de registros sin modificar
+            tempRecords.insert(record);
         }
     });
     
-    if (existingRecord) {
-        ParkingRecord updatedRecord = *existingRecord;
-        updatedRecord.exitTime = ss.str();
-        
-        records.remove(*existingRecord);
-        records.insert(updatedRecord);
-        
-        delete existingRecord;
-        saveData();
-    }
+    // Reemplazar el árbol original con el actualizado
+    records = std::move(tempRecords);
+    saveData();
 }
 
 void ParkingSystem::displayAllOwners(std::function<void(const Owner&)> display) const {

@@ -5,6 +5,8 @@
 #include <fstream>
 #include <iomanip>
 #include <sstream>
+#include <random>
+#include <vector>
 
 ParkingVisualization::ParkingVisualization() {
     // Inicializar grid vacío
@@ -18,18 +20,37 @@ bool ParkingVisualization::parkVehicle(const std::string& plate) {
         return true;
     }
     
-    // Buscar primer espacio disponible
+    // Crear un vector con todas las posiciones disponibles
+    std::vector<std::pair<int, int>> availableSpots;
     for (int i = 0; i < ROWS; i++) {
         for (int j = 0; j < COLS; j++) {
             if (parkingGrid[i][j] == "EMPTY") {
-                parkingGrid[i][j] = plate;
-                parkingMap[plate] = {i, j};
-                saveState("parking_layout.txt");
-                return true;
+                availableSpots.push_back({i, j});
             }
         }
     }
-    return false;
+    
+    // Si no hay espacios disponibles, retornar false
+    if (availableSpots.empty()) {
+        return false;
+    }
+    
+    // Inicializar el generador de números aleatorios con una semilla aleatoria
+    std::random_device rd;
+    std::mt19937 gen(rd());
+    std::uniform_int_distribution<> dis(0, availableSpots.size() - 1);
+    
+    // Seleccionar un espacio aleatorio
+    int randomIndex = dis(gen);
+    int row = availableSpots[randomIndex].first;
+    int col = availableSpots[randomIndex].second;
+    
+    // Estacionar el vehículo en la posición aleatoria
+    parkingGrid[row][col] = plate;
+    parkingMap[plate] = {row, col};
+    saveState("parking_layout.txt");
+    
+    return true;
 }
 
 bool ParkingVisualization::removeVehicle(const std::string& plate) {
