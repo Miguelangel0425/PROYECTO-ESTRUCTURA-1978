@@ -54,6 +54,9 @@ int main() {
                         if(!validaciones.validarCedula(owner.id)){
                             std :: cout << "\033[31mNumero cedula invalido. Ingrese nuevamente\033[0m";
                             std :: cout << endl;
+                        } else if (system.findOwner(owner.id)) {
+                            std :: cout << "\033[31mCedula ya registrada. Ingrese una cedula diferente\033[0m";
+                            std :: cout << endl;
                         } else {
                             break;
                         }
@@ -85,13 +88,18 @@ int main() {
                 case 1: {
                     Vehicle vehicle;
                     Validaciones validaciones;
-                    while(!validaciones.validarPlaca(vehicle.plate)){
+                    while (true) {
                         vehicle.plate = Validaciones::ingresarPlaca("Ingrese la placa del vehiculo: ");
-                        if(!validaciones.validarPlaca(vehicle.plate)){
+                        if (!validaciones.validarPlaca(vehicle.plate)) {
                             std::cout << "\033[31mPlaca invalida. Ingrese nuevamente\033[0m" << std::endl;
-                            std :: cout << endl;
+                            std::cout << std::endl;
+                        } else if (system.findVehicle(vehicle.plate)) {
+                            std::cout << "\033[31mPlaca ya registrada. Ingrese una placa diferente\033[0m" << std::endl;
+                            std::cout << std::endl;
+                        } else {
+                            break;
                         }
-                    }                   
+                    }
                     vehicle.brand = Validaciones::ingresarString("Ingrese la marca del vehiculo: ");
                     vehicle.model = Validaciones::ingresarString("Ingrese el modelo del vehiculo: ");
                     vehicle.color = Validaciones::ingresarString("Ingrese el color del vehiculo: ");
