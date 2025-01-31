@@ -153,13 +153,13 @@ void ParkingSystem::removeVehicle(const std::string& plate) {
 }
 
 Vehicle* ParkingSystem::findVehicle(const std::string& plate) {
-    Vehicle searchVehicle;
-    searchVehicle.plate = plate;
-    if(vehicles.search(searchVehicle)) {
-        Vehicle* found = new Vehicle(searchVehicle);
-        return found;
-    }
-    return nullptr;
+    Vehicle* result = nullptr;
+    vehicles.traverse([&](const Vehicle& vehicle) {
+        if (vehicle.plate == plate) {
+            result = new Vehicle(vehicle);  // Copia completa del vehículo encontrado
+        }
+    });
+    return result;
 }
 
 
@@ -275,11 +275,11 @@ std::vector<Vehicle> ParkingSystem::getVehiclesByOwnerId(const std::string& owne
 
 void ParkingSystem::registerEntry(const std::string& plate) {
     if(!findVehicle(plate)) {
-        throw std::runtime_error("Vehicle not found");
+        throw std::runtime_error("Vehiculo No Encontrado");
     }
     
     if (!parkingLayout.parkVehicle(plate)) {
-        throw std::runtime_error("No parking spaces available");
+        throw std::runtime_error("Sin Espacio en el Parqueadero");
     }
     
     auto now = std::chrono::system_clock::now();
@@ -302,12 +302,22 @@ void ParkingSystem::registerExit(const std::string& plate) {
     std::stringstream ss;
     ss << std::put_time(std::localtime(&timeT), "%Y-%m-%d %H:%M:%S");
     
-    ParkingRecord searchRecord;
-    searchRecord.plate = plate;
-    if(records.search(searchRecord)) {
-        searchRecord.exitTime = ss.str();
-        records.remove(searchRecord);
-        records.insert(searchRecord);
+    // Buscar el registro existente y mantener la hora de entrada
+    ParkingRecord* existingRecord = nullptr;
+    records.traverse([&](const ParkingRecord& record) {
+        if (record.plate == plate && record.exitTime.empty()) {
+            existingRecord = new ParkingRecord(record);
+        }
+    });
+    
+    if (existingRecord) {
+        ParkingRecord updatedRecord = *existingRecord;
+        updatedRecord.exitTime = ss.str();
+        
+        records.remove(*existingRecord);
+        records.insert(updatedRecord);
+        
+        delete existingRecord;
         saveData();
     }
 }

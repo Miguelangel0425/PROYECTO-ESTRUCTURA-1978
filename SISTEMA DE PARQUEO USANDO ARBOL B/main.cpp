@@ -15,8 +15,14 @@ void displayVehicle(const Vehicle& vehicle) {
 
 void displayRecord(const ParkingRecord& record) {
     std::cout << "Placa: " << record.plate << "\n"
-              << "Tiempo de entrada: " << record.entryTime << "\n"
-              << "Tiempo dd salida: " << record.exitTime << "\n\n";
+              << "Tiempo de entrada: " << record.entryTime;
+    
+    if (!record.exitTime.empty()) {
+        std::cout << "\nTiempo de salida: " << record.exitTime;
+    } else {
+        std::cout << "\nVehículo aún en parqueadero";
+    }
+    std::cout << "\n\n";
 }
 
 int main() {
