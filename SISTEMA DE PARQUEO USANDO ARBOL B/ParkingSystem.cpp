@@ -6,6 +6,7 @@
 #include <sstream>
 #include <algorithm>
 #include <memory>
+#include <cmath>
 
 ParkingSystem::ParkingSystem(int degree) : 
     owners(degree), vehicles(degree), records(degree) {
@@ -440,26 +441,81 @@ std::vector<ParkingRecord> ParkingSystem::searchRecordsByTimeRange(
     return result;
 }
 
+// Modificación en ParkingSystem.cpp
 std::vector<Vehicle> ParkingSystem::searchVehiclesByLocation(bool nearExit) {
     std::vector<Vehicle> result;
-    std::vector<std::string> recentPlates;
     
-    // Obtener los últimos registros (más cercanos a la salida o entrada)
-    records.traverse([&](const ParkingRecord& record) {
-        if (nearExit && record.exitTime.empty()) {
-            recentPlates.push_back(record.plate);
+    // Definir coordenadas de entrada y salida
+    const int entryRow = 0;
+    const int entryCol = 0;
+    const int exitRow = ParkingVisualization::getRows() - 1;
+    const int exitCol = ParkingVisualization::getCols() - 1;
+    
+    struct VehicleDistance {
+        Vehicle vehicle;
+        double distance;
+        bool operator<(const VehicleDistance& other) const {
+            return distance < other.distance;
         }
-    });
+    };
     
-    // Obtener los vehículos correspondientes
+    std::vector<VehicleDistance> vehiclesWithDistances;
+    
     vehicles.traverse([&](const Vehicle& vehicle) {
-        if (std::find(recentPlates.begin(), recentPlates.end(), vehicle.plate) != recentPlates.end()) {
-            result.push_back(vehicle);
+        auto position = parkingLayout.getVehiclePosition(vehicle.plate);
+        if (position.first != -1) {
+            double distance = std::sqrt(
+                std::pow(position.first - (nearExit ? exitRow : entryRow), 2) + 
+                std::pow(position.second - (nearExit ? exitCol : entryCol), 2)
+            );
+            vehiclesWithDistances.push_back({vehicle, distance});
         }
     });
     
+    std::sort(vehiclesWithDistances.begin(), vehiclesWithDistances.end());
+    
+    // Visualización con entrada y salida marcadas con colores
+    std::cout << "\033[1;36m\n=== Visualizacion de ubicaciones ===\n";
+    std::cout << (nearExit ? "Vehiculos mas cercanos a la \033[1;31mSALIDA\033[1;36m\n" : "Vehiculos mas cercanos a la \033[1;32mENTRADA\033[1;36m\n");
+    
+    for (int i = 0; i < ParkingVisualization::getRows(); i++) {
+        for (int j = 0; j < ParkingVisualization::getCols(); j++) {
+            if (i == entryRow && j == entryCol) {
+                std::cout << "\033[1;32m[E] \033[1;36m"; // Verde para la entrada
+            } else if (i == exitRow && j == exitCol) {
+                std::cout << "\033[1;31m[S] \033[1;36m"; // Rojo para la salida
+            } else {
+                auto it = std::find_if(vehiclesWithDistances.begin(), vehiclesWithDistances.end(), [&](const VehicleDistance& vd) {
+                    auto pos = parkingLayout.getVehiclePosition(vd.vehicle.plate);
+                    return pos.first == i && pos.second == j;
+                });
+                if (it != vehiclesWithDistances.end()) {
+                    std::cout << "\033[1;33m[" << it->vehicle.plate.substr(0, 3) << "] \033[1;36m"; // Amarillo para vehículos
+                } else {
+                    std::cout << "\033[1;32m[ ] \033[1;36m"; // Verde para espacios vacíos
+                }
+            }
+        }
+        std::cout << "\n";
+    }
+    
+    std::cout << "\nPunto de referencia: " << (nearExit ? "\033[1;31mSALIDA (S)\033[1;36m" : "\033[1;32mENTRADA (E)\033[1;36m")
+              << " en posicion [" << (nearExit ? exitRow + 1 : entryRow + 1) << ", "
+              << (nearExit ? exitCol + 1 : entryCol + 1) << "]\n\n";
+    
+    for (const auto& vd : vehiclesWithDistances) {
+        result.push_back(vd.vehicle);
+        auto pos = parkingLayout.getVehiclePosition(vd.vehicle.plate);
+        std::cout << "Vehiculo \033[1;33m" << vd.vehicle.plate << "\033[1;36m en posicion [" << pos.first + 1 << ", "
+                  << pos.second + 1 << "] - Distancia: " << std::fixed << std::setprecision(2)
+                  << vd.distance << " unidades\n";
+    }
+    
+    std::cout << "\033[0m"; // Reset de colores
     return result;
 }
+
+
 
 std::vector<ParkingRecord> ParkingSystem::searchRecordsByPlateAndDate(
     const std::string& plate,
