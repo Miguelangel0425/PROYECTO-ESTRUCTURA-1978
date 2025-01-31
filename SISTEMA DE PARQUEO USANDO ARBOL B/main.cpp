@@ -49,16 +49,18 @@ int main() {
                 case 0: {
                     Owner owner;
                     Validaciones validaciones;
-                    while(!validaciones.validarCedula(owner.id)){
-                        owner.id = Validaciones::ingresarNumero("Ingrese el numero de cedula: ");
-                        if (!validaciones.validarCedula(owner.id)){
-                        std :: cout << "\033[31mCedula invalida. Ingrese nuevamente\033[0m";
-                        std :: cout << endl;
+                    while(true){
+                        owner.id = Validaciones::ingresarTelefono("Ingrese el numero de cedula: ");
+                        if(!validaciones.validarCedula(owner.id)){
+                            std :: cout << "\033[31mNumero cedula invalido. Ingrese nuevamente\033[0m";
+                            std :: cout << endl;
+                        } else {
+                            break;
                         }
                     }
                     owner.name = Validaciones::ingresarString("Ingrese el nombre: ");
                     while(!validaciones.validarCelularEcuador(owner.phone)){
-                        owner.phone = Validaciones::ingresarNumero("Ingrese el telefono: "); // Changed from ingresarTelefono which doesn't exist
+                        owner.phone = Validaciones::ingresarTelefono("Ingrese el telefono: "); // Changed from ingresarTelefono which doesn't exist
                         if(!validaciones.validarCelularEcuador(owner.phone)){
                             std :: cout << "\033[31mNumero celular invalido. Ingrese nuevamente\033[0m";
                             std :: cout << endl;
@@ -99,7 +101,7 @@ int main() {
                     
                     while (true) {
                      
-                        vehicle.ownerId = Validaciones::ingresarNumero("Ingrese el numero de cedula del propietario: ");
+                        vehicle.ownerId = Validaciones::ingresarTelefono("Ingrese el numero de cedula del propietario: ");
                         if(!validaciones.validarCedula(vehicle.ownerId)){
                             std::cout << "\033[31mCedula invalida\033[0m" << std::endl;
                         } else if (system.findOwner(vehicle.ownerId)) {
@@ -118,16 +120,18 @@ int main() {
                             } else if (idErrorChoice == 1) {
                                 Owner owner;
                                 Validaciones validaciones;
-                                while(!validaciones.validarCedula(owner.id)){
-                                    owner.id = Validaciones::ingresarNumero("Ingrese el numero de cedula: ");
+                                while(true){
+                                    owner.id = Validaciones::ingresarTelefono("Ingrese el numero de cedula: ");
                                     if (!validaciones.validarCedula(owner.id)){
-                                    std :: cout << "\033[31mCedula invalida. Ingrese nuevamente\033[0m";
-                                    std :: cout << endl;
+                                        std :: cout << "\033[31mCedula invalida. Ingrese nuevamente\033[0m";
+                                        std :: cout << endl;
+                                    } else {
+                                        break;
                                     }
                                 }           
                                 owner.name = Validaciones::ingresarString("Ingrese el nombre: ");
                                 while(!validaciones.validarCelularEcuador(owner.phone)){
-                                    owner.phone = Validaciones::ingresarNumero("Ingrese el telefono: "); // Changed from ingresarTelefono which doesn't exist
+                                    owner.phone = Validaciones::ingresarTelefono("Ingrese el telefono: "); // Changed from ingresarTelefono which doesn't exist
                                     if(!validaciones.validarCelularEcuador(owner.phone)){
                                         std :: cout << "\033[31mNumero celular invalido. Ingrese nuevamente\033[0m";
                                         std :: cout << endl;
@@ -165,6 +169,7 @@ int main() {
                     Validaciones validaciones;
                     if(!validaciones.validarPlaca(vehicle.plate)){
                         std::cout << "\033[31mPlaca invalida\033[0m" << std::endl;
+                        std :: cout << endl;
                         break;
                     }
                     system.registerEntry(vehicle.plate);
@@ -176,6 +181,7 @@ int main() {
                     Validaciones validaciones;
                     if(!validaciones.validarPlaca(vehicle.plate)){
                         std::cout << "\033[31mPlaca invalida\033[0m" << std::endl;
+                        std :: cout << endl;
                         break;
                     }
                     system.registerExit(vehicle.plate);
@@ -193,6 +199,7 @@ int main() {
                     Validaciones validaciones;
                     if(!validaciones.validarPlaca(vehicle.plate)){
                         std::cout << "\033[31mPlaca invalida\033[0m" << std::endl;
+                        std :: cout << endl;
                         break;
                     }
                     system.getVehicleLocation(vehicle.plate);
@@ -297,6 +304,7 @@ int main() {
                             Validaciones validaciones;
                             if(!validaciones.validarPlaca(vehicle.plate)){
                                 std::cout << "\033[31mPlaca invalida\033[0m" << std::endl;
+                                std :: cout << endl;
                                 break;
                             }
                 
@@ -328,12 +336,14 @@ int main() {
                     };
 
                     std::string id;
-                    while(!validaciones.validarCedula(id)){
-                        id = Validaciones::ingresarNumero("Ingrese el numero de cedula: ");
-                            if (!validaciones.validarCedula(id)){
-                                std :: cout << "\033[31mCedula invalida. Ingrese nuevamente\033[0m";
-                                std :: cout << endl;
-                            } 
+                    while(true){
+                        id = Validaciones::ingresarTelefono("Ingrese el numero de cedula: ");
+                        if (!validaciones.validarCedula(id)){
+                            std :: cout << "\033[31mCedula invalida. Ingrese nuevamente\033[0m";
+                            std :: cout << endl;
+                        } else {
+                            break;
+                        }
                     }
                     Owner* existingOwner = system.findOwner(id);
 
@@ -356,7 +366,7 @@ int main() {
                             Validaciones validaciones;
                             std::cout << "Telefono actual: " << existingOwner->phone << std::endl;
                             do{
-                                updatedOwner.phone = Validaciones::ingresarNumero("Ingrese el nuevo numero de telefono: "); // Changed from ingresarTelefono which doesn't exist
+                                updatedOwner.phone = Validaciones::ingresarTelefono("Ingrese el nuevo numero de telefono: "); // Changed from ingresarTelefono which doesn't exist
                                 if(!validaciones.validarCelularEcuador(updatedOwner.phone)){
                                     std :: cout << "\033[31mNumero celular invalido. Ingrese nuevamente\033[0m";
                                     std :: cout << endl;
@@ -389,7 +399,7 @@ int main() {
                             updatedOwner.name = Validaciones::ingresarString("Ingrese el nuevo nombre: ");
                             
                             do{
-                                updatedOwner.phone = Validaciones::ingresarNumero("Ingrese el nuevo numero de telefono: "); // Changed from ingresarTelefono which doesn't exist
+                                updatedOwner.phone = Validaciones::ingresarTelefono("Ingrese el nuevo numero de telefono: "); // Changed from ingresarTelefono which doesn't exist
                                 if(!validaciones.validarCelularEcuador(updatedOwner.phone)){
                                     std :: cout << "\033[31mNumero celular invalido. Ingrese nuevamente\033[0m";
                                     std :: cout << endl;
@@ -436,7 +446,7 @@ int main() {
                             Validaciones validaciones;
                             std::string id;
                             while (!validaciones.validarCedula(id)){
-                                id = Validaciones::ingresarNumero("Ingrese el numero de cedula del propietario a eliminar:");
+                                id = Validaciones::ingresarTelefono("Ingrese el numero de cedula del propietario a eliminar:");
                                 if(!validaciones.validarCedula(id)){
                                     std :: cout << "\033[31mCedula invalida. Ingrese nuevamente\033[0m";
                                     std :: cout << endl;    

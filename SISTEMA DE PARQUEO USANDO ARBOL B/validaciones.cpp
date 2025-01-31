@@ -291,7 +291,15 @@ bool Validaciones::validarCedula(const string& idInput) {
         return false;
     }
 
-    long id = std::stol(idInput);  
+    long id;
+    try {
+        id = std::stol(idInput);
+    } catch (const std::invalid_argument&) {
+        return false;
+    } catch (const std::out_of_range&) {
+        return false;
+    }
+
     std::vector<long> digits(10);
     long remainder;
     long doubledDigit;
@@ -300,13 +308,11 @@ bool Validaciones::validarCedula(const string& idInput) {
     long totalSum;
     long checkDigit;
 
-    
     for (int i = 9; i >= 0; --i) {
         digits[i] = id % 10;
         id /= 10;
     }
 
-    
     for (int i = 0; i < 9; i += 2) {
         doubledDigit = digits[i] * 2;
         if (doubledDigit > 9) {
@@ -315,12 +321,10 @@ bool Validaciones::validarCedula(const string& idInput) {
         evenPositionSum += doubledDigit;
     }
 
-    
     for (int i = 1; i < 9; i += 2) {
         oddPositionSum += digits[i];
     }
 
-  
     totalSum = evenPositionSum + oddPositionSum;
     remainder = totalSum % 10;
     checkDigit = 10 - remainder;
@@ -328,7 +332,6 @@ bool Validaciones::validarCedula(const string& idInput) {
         checkDigit = 0;
     }
 
-    
     return checkDigit == digits[9];
 }
 
