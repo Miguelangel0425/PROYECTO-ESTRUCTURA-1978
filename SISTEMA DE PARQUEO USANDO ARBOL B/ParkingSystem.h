@@ -29,6 +29,7 @@ public:
     Owner* findOwner(const std::string& id);
     void updateOwner(const Owner& owner);
     bool deleteOwner(const std::string& id);
+    bool isOwnerRegistered(const std::string& id);
 
     // Operaciones de vehículos
     void addVehicle(const Vehicle& vehicle);
@@ -36,7 +37,9 @@ public:
     Vehicle* findVehicle(const std::string& plate);
     bool deleteVehicle(const std::string& plate);
     std::vector<Vehicle> getVehiclesByOwnerId(const std::string& ownerId);
-    
+    bool isPlateRegistered(const std::string& plate);
+    bool updateVehicle(const Vehicle& vehicle);
+
     // Operaciones de registro
     void registerEntry(const std::string& plate);
     void registerExit(const std::string& plate);

@@ -85,6 +85,30 @@ void ParkingSystem::saveData() const {
     }
 }
 
+bool ParkingSystem::isPlateRegistered(const std::string& plate) {
+    Vehicle searchVehicle;
+    searchVehicle.plate = plate;
+    bool found = false;
+    vehicles.traverse([&](const Vehicle& v) {
+        if (v.plate == plate) {
+            found = true;
+        }
+    });
+    return found;
+}
+
+bool ParkingSystem::isOwnerRegistered(const std::string& id) {
+    Owner searchOwner;
+    searchOwner.id = id;
+    bool found = false;
+    owners.traverse([&](const Owner& o) {
+        if (o.id == id) {
+            found = true;
+        }
+    });
+    return found;
+}
+
 void ParkingSystem::addOwner(const Owner& owner) {
     owners.insert(owner);
     saveData();
@@ -138,6 +162,7 @@ Vehicle* ParkingSystem::findVehicle(const std::string& plate) {
     return nullptr;
 }
 
+
 void ParkingSystem::updateOwner(const Owner& owner) {
     // Primero verificar si el propietario existe
     Owner* existing = findOwnerInTree(owner.id);
@@ -164,6 +189,35 @@ void ParkingSystem::updateOwner(const Owner& owner) {
     
     // Guardar los cambios
     saveData();
+}
+
+bool ParkingSystem::updateVehicle(const Vehicle& vehicle) {
+    // Verificar si el vehículo existe
+    Vehicle* existing = findVehicle(vehicle.plate);
+    if (!existing) {
+        return false;
+    }
+    delete existing;
+
+    // Crear una copia temporal del árbol
+    BTree<Vehicle> tempVehicles(3);
+    
+    // Copiar todos los vehículos excepto el que se va a actualizar
+    vehicles.traverse([&](const Vehicle& v) {
+        if (v.plate != vehicle.plate) {
+            tempVehicles.insert(v);
+        }
+    });
+    
+    // Insertar el vehículo actualizado
+    tempVehicles.insert(vehicle);
+    
+    // Reemplazar el árbol original
+    vehicles = std::move(tempVehicles);
+    
+    // Guardar los cambios
+    saveData();
+    return true;
 }
 
 bool ParkingSystem::deleteOwner(const std::string& id) {

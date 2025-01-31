@@ -54,6 +54,8 @@ int main() {
                         if(!validaciones.validarCedula(owner.id)){
                             std :: cout << "\033[31mNumero cedula invalido. Ingrese nuevamente\033[0m";
                             std :: cout << endl;
+                        } else if(system.isOwnerRegistered(owner.id)) {
+                            std::cout << "\033[31mEl Propietario ya se encuentra registrado. Ingrese nuevamente\033[0m" << std::endl;
                         } else {
                             break;
                         }
@@ -92,7 +94,10 @@ int main() {
                             std::cout << "\033[31mPlaca invalida. Ingrese nuevamente\033[0m" << std::endl;
                             std :: cout << endl;
                         }
-                    }                   
+                    }
+                    if(system.isPlateRegistered(vehicle.plate)) {
+                        throw std::runtime_error("El vehiculo ya se encuentra registrado.");
+                    }
                     vehicle.brand = Validaciones::ingresarString("Ingrese la marca del vehiculo: ");
                     
                     vehicle.model = Validaciones::ingresarString("Ingrese el modelo del vehiculo: ");
@@ -337,13 +342,21 @@ int main() {
                     break;
                 }
                 case 10: {
+                    std::vector<std::string> updateOptions = {
+                        "\033[1;33mActualizar Propietario\033[0m",
+                        "\033[1;33mActualizar Vehiculo\033[0m",
+                        "\033[1;33mSalir\033[0m"
+                    };
+                    int updateChoice = InteractiveMenu::showSubMenu(updateOptions, "Update Records");
+                    switch (updateChoice) {
+                        case 0: {
                     Validaciones validaciones;
                     std::vector<std::string> updateOptions = {
                         "\033[1;33mActualice Nombre\033[0m",
                         "\033[1;33mActualice Numero de Telefono\033[0m",
                         "\033[1;33mActualice Correo Electronico\033[0m",
                         "\033[1;33mActualice Toda la Informacion\033[0m"
-                        "\033[1;33mBack\033[0m"
+                        "\033[1;33mVolver \033[0m"
                     };
 
                     std::string id;
@@ -432,7 +445,7 @@ int main() {
                         }
                     }
 
-                    if(!updateChoice == 4){
+                    if(!(updateChoice == 4)){
                         if(Owner::isValid(updatedOwner)){
                             system.updateOwner(updatedOwner);
                             std::cout << "Propietario actualizado exitosamente" << std::endl;
@@ -443,7 +456,78 @@ int main() {
 
                     delete existingOwner;
                     break;
+                        }
+                        case 1: {
+            std::string plate;
+            Validaciones validaciones;
+            while(!validaciones.validarPlaca(plate)){
+                plate = Validaciones::ingresarPlaca("Ingrese la placa del vehiculo a actualizar: ");
+                if(!validaciones.validarPlaca(plate)){
+                    std::cout << "\033[31mPlaca invalida. Ingrese nuevamente\033[0m" << std::endl;
+                    std::cout << endl;
                 }
+            }
+            
+            Vehicle* existingVehicle = system.findVehicle(plate);
+            if (!existingVehicle) {
+                std::cout << "Vehiculo no encontrado" << std::endl;
+                break;
+            }
+
+            Vehicle updatedVehicle = *existingVehicle;
+            
+            std::vector<std::string> vehicleUpdateOptions = {
+                "\033[1;33mActualizar Marca\033[0m",
+                "\033[1;33mActualizar Modelo\033[0m",
+                "\033[1;33mActualizar Color\033[0m",
+                "\033[1;33mActualizar Toda la Informacion\033[0m",
+                "\033[1;33mSalir\033[0m"
+            };
+
+            int vehicleUpdateChoice = InteractiveMenu::showSubMenu(vehicleUpdateOptions, "Update Vehicle");
+            
+            switch(vehicleUpdateChoice) {
+                case 0:
+                    std::cout << "Marca actual: " << existingVehicle->brand << std::endl;
+                    updatedVehicle.brand = Validaciones::ingresarString("Ingrese la nueva marca: ");
+                    break;
+                case 1:
+                    std::cout << "Modelo actual: " << existingVehicle->model << std::endl;
+                    updatedVehicle.model = Validaciones::ingresarString("Ingrese el nuevo modelo: ");
+                    break;
+                case 2:
+                    std::cout << "Color actual: " << existingVehicle->color << std::endl;
+                    updatedVehicle.color = Validaciones::ingresarString("Ingrese el nuevo color: ");
+                    break;
+                case 3:
+                    std::cout << "Datos actuales:" << std::endl;
+                    std::cout << "Marca: " << existingVehicle->brand << std::endl;
+                    std::cout << "Modelo: " << existingVehicle->model << std::endl;
+                    std::cout << "Color: " << existingVehicle->color << std::endl;
+                    
+                    updatedVehicle.brand = Validaciones::ingresarString("Ingrese la nueva marca: ");
+                    updatedVehicle.model = Validaciones::ingresarString("Ingrese el nuevo modelo: ");
+                    updatedVehicle.color = Validaciones::ingresarString("Ingrese el nuevo color: ");
+                    break;
+                case 4:
+                    delete existingVehicle;
+                    break;
+            }
+
+            if (vehicleUpdateChoice != 4) {
+                if (system.updateVehicle(updatedVehicle)) {
+                    std::cout << "Vehiculo actualizado exitosamente" << std::endl;
+                } else {
+                    std::cout << "Error al actualizar el vehiculo" << std::endl;
+                }
+            }
+            
+            delete existingVehicle;
+            break;
+            }
+            }
+            break;   
+                };
 
                 case 11: {
                     std::vector<std::string> deleteOptions = {
