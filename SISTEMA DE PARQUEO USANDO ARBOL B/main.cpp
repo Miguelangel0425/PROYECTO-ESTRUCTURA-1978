@@ -103,16 +103,24 @@ int main() {
                      
                         vehicle.ownerId = Validaciones::ingresarTelefono("Ingrese el numero de cedula del propietario: ");
                         if(!validaciones.validarCedula(vehicle.ownerId)){
-                            std::cout << "\033[31mCedula invalida\033[0m" << std::endl;
+                            std::cout << "\033[31mCedula invalida. Ingrese nuevamente.\033[0m" << std::endl;
                         } else if (system.findOwner(vehicle.ownerId)) {
                             system.addVehicle(vehicle);
                             break;
                         } else {
+                            Owner owner;
+                            owner.id = vehicle.ownerId; // Mostrar el ID ingresado anteriormente
+                            std::cout << "\033[31mCedula no se encuentra registrada:\033[0m" <<  std::endl;
+                            std::cout << "\033[31mPara modificar o agregar propietario.\033[0m" << std::endl;
+                            std::cout << "\033[31mPresione enter.\033[0m" << std::endl;
+                            std::cin.ignore(); // Esperar a que el usuario presione Enter
+                               
                             std::vector<std::string> idErrorOptions = {
                                 "\033[1;33mReingresar Cedula\033[0m",
                                 "\033[1;33mAgregar Nuevo Propietario\033[0m",
                                 "\033[1;33mCancelar\033[0m"
                             };
+                            
                             int idErrorChoice = InteractiveMenu::showSubMenu(idErrorOptions, "Invalid Owner ID");
                             
                             if (idErrorChoice == 0) {
@@ -121,6 +129,8 @@ int main() {
                                 Owner owner;
                                 Validaciones validaciones;
                                 while(true){
+                                    owner.id = vehicle.ownerId; // Mostrar el ID ingresado anteriormente
+                                    std::cout << "Use la cedula: " << owner.id << std::endl;
                                     owner.id = Validaciones::ingresarTelefono("Ingrese el numero de cedula: ");
                                     if (!validaciones.validarCedula(owner.id)){
                                         std :: cout << "\033[31mCedula invalida. Ingrese nuevamente\033[0m";
@@ -128,6 +138,7 @@ int main() {
                                     } else {
                                         break;
                                     }
+                                    
                                 }           
                                 owner.name = Validaciones::ingresarString("Ingrese el nombre: ");
                                 while(!validaciones.validarCelularEcuador(owner.phone)){
