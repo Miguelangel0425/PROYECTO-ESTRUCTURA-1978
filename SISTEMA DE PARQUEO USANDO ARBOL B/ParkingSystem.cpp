@@ -443,3 +443,11 @@ std::vector<ParkingRecord> ParkingSystem::searchRecordsByPlateAndDate(
     
     return result;
 }
+
+int ParkingSystem::getVehicleCount() const {
+    int count = 0;
+    vehicles.traverse([&](const Vehicle&) {
+        count++;
+    });
+    return count;
+}

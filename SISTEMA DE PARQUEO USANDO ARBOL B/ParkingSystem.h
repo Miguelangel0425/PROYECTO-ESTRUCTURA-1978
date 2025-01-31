@@ -39,6 +39,7 @@ public:
     std::vector<Vehicle> getVehiclesByOwnerId(const std::string& ownerId);
     bool isPlateRegistered(const std::string& plate);
     bool updateVehicle(const Vehicle& vehicle);
+    int getVehicleCount() const;
 
     // Operaciones de registro
     void registerEntry(const std::string& plate);

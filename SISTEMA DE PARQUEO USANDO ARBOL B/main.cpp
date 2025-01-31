@@ -15,14 +15,8 @@ void displayVehicle(const Vehicle& vehicle) {
 
 void displayRecord(const ParkingRecord& record) {
     std::cout << "Placa: " << record.plate << "\n"
-              << "Tiempo de entrada: " << record.entryTime;
-    
-    if (!record.exitTime.empty()) {
-        std::cout << "\nTiempo de salida: " << record.exitTime;
-    } else {
-        std::cout << "\nVehículo aún en parqueadero";
-    }
-    std::cout << "\n\n";
+              << "Tiempo de entrada: " << record.entryTime << "\n"
+              << "Tiempo de salida: " << record.exitTime << "\n\n";
 }
 
 int main() {
@@ -60,15 +54,13 @@ int main() {
                         if(!validaciones.validarCedula(owner.id)){
                             std :: cout << "\033[31mNumero cedula invalido. Ingrese nuevamente\033[0m";
                             std :: cout << endl;
-                        } else if(system.isOwnerRegistered(owner.id)) {
-                            std::cout << "\033[31mEl Propietario ya se encuentra registrado. Ingrese nuevamente\033[0m" << std::endl;
                         } else {
                             break;
                         }
                     }
                     owner.name = Validaciones::ingresarString("Ingrese el nombre: ");
                     while(!validaciones.validarCelularEcuador(owner.phone)){
-                        owner.phone = Validaciones::ingresarTelefono("Ingrese el telefono: "); // Changed from ingresarTelefono which doesn't exist
+                        owner.phone = Validaciones::ingresarTelefono("Ingrese el telefono: ");
                         if(!validaciones.validarCelularEcuador(owner.phone)){
                             std :: cout << "\033[31mNumero celular invalido. Ingrese nuevamente\033[0m";
                             std :: cout << endl;
@@ -82,7 +74,6 @@ int main() {
                         }
                     }
                     
-    
                     if (Owner::isValid(owner)) {
                         system.addOwner(owner);
                         std::cout << "Propietario agregado exitosamente." << std::endl;
@@ -100,18 +91,12 @@ int main() {
                             std::cout << "\033[31mPlaca invalida. Ingrese nuevamente\033[0m" << std::endl;
                             std :: cout << endl;
                         }
-                    }
-                    if(system.isPlateRegistered(vehicle.plate)) {
-                        throw std::runtime_error("El vehiculo ya se encuentra registrado.");
-                    }
+                    }                   
                     vehicle.brand = Validaciones::ingresarString("Ingrese la marca del vehiculo: ");
-                    
                     vehicle.model = Validaciones::ingresarString("Ingrese el modelo del vehiculo: ");
-                    
                     vehicle.color = Validaciones::ingresarString("Ingrese el color del vehiculo: ");
                     
                     while (true) {
-                     
                         vehicle.ownerId = Validaciones::ingresarTelefono("Ingrese el numero de cedula del propietario: ");
                         if(!validaciones.validarCedula(vehicle.ownerId)){
                             std::cout << "\033[31mCedula invalida. Ingrese nuevamente.\033[0m" << std::endl;
@@ -120,11 +105,11 @@ int main() {
                             break;
                         } else {
                             Owner owner;
-                            owner.id = vehicle.ownerId; // Mostrar el ID ingresado anteriormente
+                            owner.id = vehicle.ownerId;
                             std::cout << "\033[31mCedula no se encuentra registrada:\033[0m" <<  std::endl;
                             std::cout << "\033[31mPara modificar o agregar propietario.\033[0m" << std::endl;
                             std::cout << "\033[31mPresione enter.\033[0m" << std::endl;
-                            std::cin.ignore(); // Esperar a que el usuario presione Enter
+                            std::cin.ignore();
                                
                             std::vector<std::string> idErrorOptions = {
                                 "\033[1;33mReingresar Cedula\033[0m",
@@ -140,7 +125,7 @@ int main() {
                                 Owner owner;
                                 Validaciones validaciones;
                                 while(true){
-                                    owner.id = vehicle.ownerId; // Mostrar el ID ingresado anteriormente
+                                    owner.id = vehicle.ownerId;
                                     std::cout << "Use la cedula: " << owner.id << std::endl;
                                     owner.id = Validaciones::ingresarTelefono("Ingrese el numero de cedula: ");
                                     if (!validaciones.validarCedula(owner.id)){
@@ -149,11 +134,10 @@ int main() {
                                     } else {
                                         break;
                                     }
-                                    
                                 }           
                                 owner.name = Validaciones::ingresarString("Ingrese el nombre: ");
                                 while(!validaciones.validarCelularEcuador(owner.phone)){
-                                    owner.phone = Validaciones::ingresarTelefono("Ingrese el telefono: "); // Changed from ingresarTelefono which doesn't exist
+                                    owner.phone = Validaciones::ingresarTelefono("Ingrese el telefono: ");
                                     if(!validaciones.validarCelularEcuador(owner.phone)){
                                         std :: cout << "\033[31mNumero celular invalido. Ingrese nuevamente\033[0m";
                                         std :: cout << endl;
@@ -185,20 +169,94 @@ int main() {
                     break;
                 }
                 case 2: {
-                    Vehicle vehicle;
-
-                    vehicle.plate = Validaciones::ingresarPlaca("Ingrese la placa del vehiculo: ");
-                    Validaciones validaciones;
-                    if(!validaciones.validarPlaca(vehicle.plate)){
-                        std::cout << "\033[31mPlaca invalida\033[0m" << std::endl;
-                        std :: cout << endl;
+                    if (system.getVehicleCount() == 0) {
+                        std::cout << "\033[31mNo hay vehiculos registrados. Agregue el vehiculo primero.\033[0m" << std::endl;
                         break;
                     }
-                    system.registerEntry(vehicle.plate);
+                    while (true) {
+                        if (system.getVehicleCount() == 0) {
+                            std::cout << "\033[31mNo hay vehiculos registrados. Agregue el vehiculo primero.\033[0m" << std::endl;
+                            break;
+                        }
+                        Vehicle vehicle;
+                        Validaciones validaciones;
+                        vehicle.plate = Validaciones::ingresarPlaca("Ingrese la placa del vehiculo: ");
+                        
+                        if (!system.findVehicle(vehicle.plate)) {
+                            std::cout << "\033[31mVehiculo no registrado o placa mal ingresada.\033[0m" << std::endl;
+                            std::cout << "\033[31mPresione enter para registrar \nvehiculo o modificar placa.\033[0m" << std::endl;
+                            std::cin.ignore();
+                            std::vector<std::string> plateErrorOptions = {
+                                "\033[1;33mModificar Placa\033[0m",
+                                "\033[1;33mRegistrar Vehiculo\033[0m",
+                                "\033[1;33mCancelar\033[0m"
+                            };
+                            
+                            int plateErrorChoice = InteractiveMenu::showSubMenu(plateErrorOptions, "Invalid Plate");
+                            
+                            if (plateErrorChoice == 0) {
+                                continue;
+                            } else if (plateErrorChoice == 1) {
+                                vehicle.plate = Validaciones::ingresarPlaca("Ingrese la placa del vehiculo: ");
+                                vehicle.brand = Validaciones::ingresarString("Ingrese la marca del vehiculo: ");
+                                vehicle.model = Validaciones::ingresarString("Ingrese el modelo del vehiculo: ");
+                                vehicle.color = Validaciones::ingresarString("Ingrese el color del vehiculo: ");
+                                vehicle.ownerId = Validaciones::ingresarTelefono("Ingrese el numero de cedula del propietario: ");
+                                
+                                if (!system.findOwner(vehicle.ownerId)) {
+                                    std::cout << "\033[31mPropietario no encontrado. Agregue el propietario primero.\033[0m" << std::endl;
+                                    
+                                    Owner owner;
+                                    owner.id = vehicle.ownerId;
+                                    owner.name = Validaciones::ingresarString("Ingrese el nombre del propietario: ");
+                                    while(!validaciones.validarCelularEcuador(owner.phone)){
+                                        owner.phone = Validaciones::ingresarTelefono("Ingrese el telefono del propietario: ");
+                                        if(!validaciones.validarCelularEcuador(owner.phone)){
+                                            std :: cout << "\033[31mNumero celular invalido. Ingrese nuevamente\033[0m";
+                                            std :: cout << endl;
+                                        }
+                                    }
+                                    while(!validaciones.validarCorreo(owner.email)){
+                                        owner.email = Validaciones::ingresarCorreo("Ingrese el correo del propietario: ");
+                                        if(!validaciones.validarCorreo(owner.email)){
+                                            std :: cout << "\033[31mCorreo invalido. Ingrese nuevamente\033[0m";
+                                            std :: cout << endl;
+                                        }
+                                    }
+                                    
+                                    if (Owner::isValid(owner)) {
+                                        system.addOwner(owner);
+                                        std::cout << "Propietario agregado exitosamente." << std::endl;
+                                    } else {
+                                        std::cout << "\033[31mDatos de propietario inválidos. Cancelando operación.\033[0m" << std::endl;
+                                        break;
+                                    }
+                                }
+                                
+                                system.addVehicle(vehicle);
+                                std::cout << "Vehiculo agregado exitosamente." << std::endl;
+                                continue;
+                            } else {
+                                std::cout << "Operacion cancelada." << std::endl;
+                                break;
+                            }
+                        }
+                        if(!validaciones.validarPlaca(vehicle.plate)){
+                            std::cout << "\033[31mPlaca invalida\033[0m" << std::endl;
+                            std :: cout << endl;
+                            continue;
+                        }
+                        system.registerEntry(vehicle.plate);
+                        break;
+                    }
                     break;
                 }
                 case 3: {
-                Vehicle vehicle;
+                    if (system.getVehicleCount() == 0) {
+                        std::cout << "\033[31mNo hay vehiculos registrados. Agregue un vehiculo primero.\033[0m" << std::endl;
+                        break;
+                    }
+                    Vehicle vehicle;
                     vehicle.plate = Validaciones::ingresarPlaca("Ingrese la placa del vehiculo: ");
                     Validaciones validaciones;
                     if(!validaciones.validarPlaca(vehicle.plate)){
@@ -215,8 +273,11 @@ int main() {
                         break;
                     }   
                 case 5: { // Find Vehicle Location
+                    if (system.getVehicleCount() == 0) {
+                        std::cout << "\033[31mNo hay vehiculos registrados. No se puede realizar la operacion.\033[0m" << std::endl;
+                        break;
+                    }
                     Vehicle vehicle;
-
                     vehicle.plate = Validaciones::ingresarPlaca("Ingrese la placa del vehiculo: ");
                     Validaciones validaciones;
                     if(!validaciones.validarPlaca(vehicle.plate)){
@@ -226,26 +287,48 @@ int main() {
                     }
                     system.getVehicleLocation(vehicle.plate);
                     break;
-                    }         
-                case 6:
-                    system.displayAllOwners([](const Owner& owner) {
+                }         
+                case 6: {
+                    bool hasOwners = false;
+                    system.displayAllOwners([&](const Owner& owner) {
+                        hasOwners = true;
                         std::cout << "Cedula: " << owner.id << "\n"
                                 << "Nombre: " << owner.name << "\n"
                                 << "Telefono: " << owner.phone << "\n"
                                 << "Correo Electronico: " << owner.email << "\n\n";
                     });
+                    if (!hasOwners) {
+                        std::cout << "\033[31mNo hay registros de propietarios en el archivo.\033[0m" << std::endl;
+                    }
                     break;
-                case 7:
-                    system.displayAllVehicles([](const Vehicle& vehicle) {
+                }
+                case 7: {
+                    bool hasVehicles = false;
+                    system.displayAllVehicles([&](const Vehicle& vehicle) {
+                        hasVehicles = true;
                         displayVehicle(vehicle);
                     });
+                    if (!hasVehicles) {
+                        std::cout << "\033[31mNo hay registros de vehiculos en el archivo.\033[0m" << std::endl;
+                    }
                     break;
-                case 8:
-                    system.displayAllRecords([](const ParkingRecord& record) {
+                }
+                case 8: {
+                    bool hasRecords = false;
+                    system.displayAllRecords([&](const ParkingRecord& record) {
+                        hasRecords = true;
                         displayRecord(record);
                     });
+                    if (!hasRecords) {
+                        std::cout << "\033[31mNo hay registros de entradas/salidas en el archivo.\033[0m" << std::endl;
+                    }
                     break;
+                }
                 case 9: { // Advanced Search
+                    if (system.getVehicleCount() == 0) {
+                        std::cout << "\033[31mNo hay vehiculos registrados. No se puede realizar la operacion.\033[0m" << std::endl;
+                        break;
+                    }
                     std::vector<std::string> searchOptions = {
                         "\033[1;33mBuscar por Nombre de Usuario\033[0m",
                         "\033[1;33mBuscar por Criterio de Vehiculo\033[0m",
@@ -262,8 +345,12 @@ int main() {
                         case 0: { // Search by Owner Name
                             input = Validaciones :: ingresarString("Ingrese el Nombre de Usuario a buscar: ");
                             auto results = system.searchVehiclesByOwnerName(input);
-                            for (const auto& vehicle : results) {
-                                displayVehicle(vehicle);
+                            if (results.empty()) {
+                                std::cout << "\033[31mNo se encontraron vehiculos para el nombre de usuario proporcionado.\033[0m" << std::endl;
+                            } else {
+                                for (const auto& vehicle : results) {
+                                    displayVehicle(vehicle);
+                                }
                             }
                             break;
                         }
@@ -273,8 +360,12 @@ int main() {
                             model = Validaciones::ingresarString("Ingresar Modelo: ");
                             color = Validaciones::ingresarString("Ingresar color: ");
                             auto results = system.searchVehiclesByAllCriteria(brand, model, color);
-                            for (const auto& vehicle : results) {
-                                displayVehicle(vehicle);
+                            if (results.empty()) {
+                                std::cout << "\033[31mNo se encontraron vehiculos que coincidan con los criterios proporcionados.\033[0m" << std::endl;
+                            } else {
+                                for (const auto& vehicle : results) {
+                                    displayVehicle(vehicle);
+                                }
                             }
                             break;
                         }
@@ -297,8 +388,12 @@ int main() {
                             }
 
                             auto results = system.searchRecordsByTimeRange(startTime, endTime);
-                            for (const auto& record : results) {
-                                displayRecord(record);
+                            if (results.empty()) {
+                                std::cout << "\033[31mNo se encontraron registros en el rango de tiempo proporcionado.\033[0m" << std::endl;
+                            } else {
+                                for (const auto& record : results) {
+                                    displayRecord(record);
+                                }
                             }
                             break;
                         }
@@ -312,8 +407,12 @@ int main() {
                             int locChoice = InteractiveMenu::showSubMenu(locationOptions, "Search by Location");
                             if (locChoice < 2) {
                                 auto results = system.searchVehiclesByLocation(locChoice == 0);
-                                for (const auto& vehicle : results) {
-                                    displayVehicle(vehicle);
+                                if (results.empty()) {
+                                    std::cout << "\033[31mNo se encontraron vehiculos en la ubicacion proporcionada.\033[0m" << std::endl;
+                                } else {
+                                    for (const auto& vehicle : results) {
+                                        displayVehicle(vehicle);
+                                    }
                                 }
                             }
                             break;
@@ -335,8 +434,12 @@ int main() {
                             std::getline(std::cin, date);
                             
                             auto results = system.searchRecordsByPlateAndDate(plate, date);
-                            for (const auto& record : results) {
-                                displayRecord(record);
+                            if (results.empty()) {
+                                std::cout << "\033[31mNo se encontraron registros para la placa y fecha proporcionadas.\033[0m" << std::endl;
+                            } else {
+                                for (const auto& record : results) {
+                                    displayRecord(record);
+                                }
                             }
                             break;
                         }
@@ -348,6 +451,10 @@ int main() {
                     break;
                 }
                 case 10: {
+                    if (system.getVehicleCount() == 0) {
+                        std::cout << "\033[31mNo hay vehiculos registrados. No se puede realizar la operacion.\033[0m" << std::endl;
+                        break;
+                    }
                     std::vector<std::string> updateOptions = {
                         "\033[1;33mActualizar Propietario\033[0m",
                         "\033[1;33mActualizar Vehiculo\033[0m",
@@ -536,6 +643,10 @@ int main() {
                 };
 
                 case 11: {
+                    if (system.getVehicleCount() == 0) {
+                        std::cout << "\033[31mNo hay vehiculos registrados. No se puede realizar la operacion.\033[0m" << std::endl;
+                        break;
+                    }
                     std::vector<std::string> deleteOptions = {
                         "\033[1;33mEliminar Propietario\033[0m",
                         "\033[1;33mEliminar Vehiculo\033[0m",
@@ -544,6 +655,10 @@ int main() {
                     int deleteChoice = InteractiveMenu::showSubMenu(deleteOptions, "Delete Records");
                     switch (deleteChoice){
                         case 0:{
+                            if (system.getVehicleCount() == 0) {
+                                std::cout << "\033[31mNo hay registros de propietarios. No se puede realizar la operacion.\033[0m" << std::endl;
+                                break;
+                            }
                             Validaciones validaciones;
                             std::string id;
                             while (!validaciones.validarCedula(id)){
@@ -561,6 +676,10 @@ int main() {
                             break;
                         }
                         case 1:{
+                            if (system.getVehicleCount() == 0) {
+                                std::cout << "\033[31mNo hay registros de vehiculos. No se puede realizar la operacion.\033[0m" << std::endl;
+                                break;
+                            }
                             std::string plate;
                             Validaciones validaciones;
                             while(!validaciones.validarPlaca(plate)){
