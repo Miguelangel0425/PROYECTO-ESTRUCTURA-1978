@@ -274,19 +274,29 @@ std::vector<Vehicle> ParkingSystem::getVehiclesByOwnerId(const std::string& owne
 }
 
 void ParkingSystem::registerEntry(const std::string& plate) {
-    if(!findVehicle(plate)) {
-        throw std::runtime_error("Vehiculo No Encontrado");
+    // First check if the vehicle exists in our system
+    if (!findVehicle(plate)) {
+        throw std::runtime_error("\033[31mError: Vehiculo no registrado en el sistema\033[0m");
     }
     
+    // Check if vehicle is already parked
+    auto position = parkingLayout.getVehiclePosition(plate);
+    if (position.first != -1) {
+        throw std::runtime_error("\033[31mError: El vehiculo ya se encuentra en el parqueadero\033[0m");
+    }
+    
+    // Try to park the vehicle
     if (!parkingLayout.parkVehicle(plate)) {
-        throw std::runtime_error("Sin Espacio en el Parqueadero");
+        throw std::runtime_error("\033[31mError: No hay espacios disponibles en el parqueadero\033[0m");
     }
     
+    // Get current time
     auto now = std::chrono::system_clock::now();
     auto timeT = std::chrono::system_clock::to_time_t(now);
     std::stringstream ss;
     ss << std::put_time(std::localtime(&timeT), "%Y-%m-%d %H:%M:%S");
     
+    // Create and save parking record
     ParkingRecord record;
     record.plate = plate;
     record.entryTime = ss.str();
@@ -295,30 +305,51 @@ void ParkingSystem::registerEntry(const std::string& plate) {
 }
 
 void ParkingSystem::registerExit(const std::string& plate) {
-    parkingLayout.removeVehicle(plate);
+    // First check if the vehicle exists in our system
+    if (!findVehicle(plate)) {
+        throw std::runtime_error("\033[31mError: Vehiculo no registrado en el sistema\033[0m");
+    }
     
+    // Check if vehicle is actually parked
+    auto position = parkingLayout.getVehiclePosition(plate);
+    if (position.first == -1) {
+        throw std::runtime_error("\033[31mError: El vehiculo no se encuentra en el parqueadero\033[0m");
+    }
+    
+    // Remove vehicle from parking layout
+    if (!parkingLayout.removeVehicle(plate)) {
+        throw std::runtime_error("\033[31mError: No se pudo retirar el vehiculo del parqueadero\033[0m");
+    }
+    
+    // Get current time
     auto now = std::chrono::system_clock::now();
     auto timeT = std::chrono::system_clock::to_time_t(now);
     std::stringstream ss;
     ss << std::put_time(std::localtime(&timeT), "%Y-%m-%d %H:%M:%S");
     
-    // Crear un árbol temporal para los registros actualizados
+    // Create a temporary tree for updated records
     BTree<ParkingRecord> tempRecords(3);
     
-    // Copiar todos los registros, actualizando el que corresponde
+    // Find and update the corresponding entry record
+    bool foundRecord = false;
     records.traverse([&](const ParkingRecord& record) {
         if (record.plate == plate && record.exitTime.empty()) {
-            // Crear registro actualizado
+            // Update the record with exit time
             ParkingRecord updatedRecord = record;
             updatedRecord.exitTime = ss.str();
             tempRecords.insert(updatedRecord);
+            foundRecord = true;
         } else {
-            // Copiar el resto de registros sin modificar
+            // Copy other records without modification
             tempRecords.insert(record);
         }
     });
     
-    // Reemplazar el árbol original con el actualizado
+    if (!foundRecord) {
+        throw std::runtime_error("\033[31mError: No se encontro registro de entrada para este vehiculo\033[0m");
+    }
+    
+    // Replace original tree with updated one
     records = std::move(tempRecords);
     saveData();
 }
