@@ -23,7 +23,7 @@ int main() {
     ParkingSystem system(3);
     
     std::vector<std::string> mainMenuOptions = {
-        "\033[1;33mAgragar Propietario\033[0m",            
+        "\033[1;33mAgregar Propietario\033[0m",            
         "\033[1;33mAgregar Vehiculo\033[0m",         
         "\033[1;33mRegistrar Entrada\033[0m",      
         "\033[1;33mRegistrar Salida\033[0m", 
@@ -231,8 +231,7 @@ int main() {
                     
                     switch (searchChoice) {
                         case 0: { // Search by Owner Name
-                            std::cout << "Ingrese por Nombre de Usuario: ";
-                            std::getline(std::cin, input);
+                            input = Validaciones :: ingresarString("Ingrese el Nombre de Usuario a buscar: ");
                             auto results = system.searchVehiclesByOwnerName(input);
                             for (const auto& vehicle : results) {
                                 displayVehicle(vehicle);
@@ -241,13 +240,9 @@ int main() {
                         }
                         case 1: { // Search by Vehicle Criteria
                             std::string brand, model, color;
-                            std::cout << "Ingresar marca (or press Enter to skip): ";
-                            std::getline(std::cin, brand);
-                            std::cout << "Ingresar modelo (or press Enter to skip): ";
-                            std::getline(std::cin, model);
-                            std::cout << "Ingresar color (or press Enter to skip): ";
-                            std::getline(std::cin, color);
-                            
+                            brand = Validaciones::ingresarString("Ingresar marca: ");
+                            model = Validaciones::ingresarString("Ingresar Modelo: ");
+                            color = Validaciones::ingresarString("Ingresar color: ");
                             auto results = system.searchVehiclesByAllCriteria(brand, model, color);
                             for (const auto& vehicle : results) {
                                 displayVehicle(vehicle);
@@ -255,12 +250,23 @@ int main() {
                             break;
                         }
                         case 2: { // Search by Time Range
+                            Validaciones validaciones;
                             std::string startTime, endTime;
-                            std::cout << "Ingrese tiempo de inicio (YYYY-MM-DD HH:MM:SS): ";
-                            std::getline(std::cin, startTime);
-                            std::cout << "Ingrese tiempo de fin (YYYY-MM-DD HH:MM:SS): ";
-                            std::getline(std::cin, endTime);
-                            
+                            while(!validaciones.validarFechaHora(startTime)){
+                                startTime = Validaciones::ingresarFecha("Ingrese tiempo de inicio (YYYY-MM-DD HH:MM:SS): ");
+                                if (!validaciones.validarFechaHora(startTime)){
+                                    std::cout << "\033[31mRango invalido. Ingrese nuevamente\033[0m";
+                                    std::cout << endl;
+                                }
+                            }
+                            while(!validaciones.validarFechaHora(endTime)){
+                                endTime = Validaciones::ingresarFecha("Ingrese tiempo de fin (YYYY-MM-DD HH:MM:SS): ");
+                                if (!validaciones.validarFechaHora(endTime)){
+                                    std::cout << "\033[31mRango invalido. Ingrese nuevamente\033[0m";
+                                    std::cout << endl;
+                                }
+                            }
+
                             auto results = system.searchRecordsByTimeRange(startTime, endTime);
                             for (const auto& record : results) {
                                 displayRecord(record);
@@ -287,12 +293,12 @@ int main() {
                             std::string plate, date;
                             Vehicle vehicle;
 
-                    vehicle.plate = Validaciones::ingresarPlaca("Ingrese la placa del vehiculo: ");
-                    Validaciones validaciones;
-                    if(!validaciones.validarPlaca(vehicle.plate)){
-                        std::cout << "\033[31mPlaca invalida\033[0m" << std::endl;
-                        break;
-                    }
+                            vehicle.plate = Validaciones::ingresarPlaca("Ingrese la placa del vehiculo: ");
+                            Validaciones validaciones;
+                            if(!validaciones.validarPlaca(vehicle.plate)){
+                                std::cout << "\033[31mPlaca invalida\033[0m" << std::endl;
+                                break;
+                            }
                 
                             std::getline(std::cin, plate);
                             std::cout << "Ingrese Fecha (YYYY-MM-DD): ";
@@ -445,8 +451,15 @@ int main() {
                         }
                         case 1:{
                             std::string plate;
-                            std::cout << "Ingrese la placa del vehiculo a eliminar: ";
-                            std::getline(std::cin, plate);
+                            Validaciones validaciones;
+                            while(!validaciones.validarPlaca(plate)){
+                                plate = Validaciones::ingresarPlaca("Ingrese la placa del vehiculo a eliminar: ");
+                                if(!validaciones.validarPlaca(plate)){
+                                    std::cout << "\033[31mPlaca invalida. Ingrese nuevamente\033[0m" << std::endl;
+                                    std :: cout << endl;
+                                }
+                            }
+                            
                             if(system.deleteVehicle(plate)){
                                 std::cout << "Vehiculo eliminado exitosamente" << std::endl;
                             } else {

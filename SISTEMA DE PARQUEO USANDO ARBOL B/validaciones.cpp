@@ -198,29 +198,19 @@ string Validaciones::ingresarFecha(const string& msj) {
     while (true) {
         c = _getch();
 
-        if (isdigit(c) || c == '-') {
-            if (fecha.length() < 10) {
-                fecha += c;
-                cout << c;
-            }
-            else {
-                cout << "\a";
-            }
+        if (isdigit(c) || c == '-' || c == ' '|| c == ':') {  
+            fecha += c;
+            cout << c;
         }
-        else if (c == '\b' && !fecha.empty()) {
+        else if (c == '\b' && !fecha.empty()) {  
             fecha.pop_back();
             cout << "\b \b";
         }
-        else if (c == '\r') {
-            if (fecha.length() == 10) { // formato YYYY-MM-DD
-                break;
-            }
-            else {
-                cout << "\a";
-            }
+        else if (c == '\r') {  
+            break;
         }
         else {
-            cout << "\a";
+            cout << "\a";  
         }
     }
 
@@ -419,4 +409,36 @@ bool Validaciones::validarCelularEcuador(const string& numero) {
 bool Validaciones::validarCorreo(const string& correo) {
     const regex pattern(R"((\w+)(\.{1}\w+)*@(\w+)(\.{1}\w+)+)");
     return regex_match(correo, pattern);
+}
+
+bool Validaciones::esBisiesto(int anio) {
+    return (anio % 4 == 0 && anio % 100 != 0) || (anio % 400 == 0);
+}
+
+bool Validaciones::validarFechaHora(const std::string& fechaHora) {
+    std::regex patron(R"(^(\d{4})-(\d{2})-(\d{2}) (\d{2}):(\d{2}):(\d{2})$)");
+    std::smatch match;
+
+    if (!std::regex_match(fechaHora, match, patron)) {
+        return false;
+    }
+
+    int anio = std::stoi(match[1].str());
+    int mes = std::stoi(match[2].str());
+    int dia = std::stoi(match[3].str());
+    int hora = std::stoi(match[4].str());
+    int minuto = std::stoi(match[5].str());
+    int segundo = std::stoi(match[6].str());
+
+    // Año mínimo permitido
+    if (anio < 1900 || anio > 2100) { 
+        return false;
+    }
+
+    if (mes < 1 || mes > 12 || dia < 1 || hora > 23 || minuto > 59 || segundo > 59) {
+        return false;
+    }
+
+    int diasPorMes[] = {0, 31, (esBisiesto(anio) ? 29 : 28), 31, 30, 31, 30, 31, 31, 30, 31, 30, 31};
+    return dia <= diasPorMes[mes];
 }

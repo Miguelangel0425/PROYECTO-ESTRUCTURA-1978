@@ -18,4 +18,6 @@ public:
     static string ingresarHora(const string& msj);
     bool validarPlaca(const string &placa);
     bool validarCelularEcuador(const string& numero);
+    static bool validarFechaHora(const std::string& fechaHora);
+    static bool esBisiesto(int anio);
 };
