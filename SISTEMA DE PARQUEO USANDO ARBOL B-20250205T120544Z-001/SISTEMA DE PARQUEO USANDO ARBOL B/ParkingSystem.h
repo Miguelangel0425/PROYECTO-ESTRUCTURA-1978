@@ -22,6 +22,7 @@ public:
     //grafica
     void displayParkingLayout() const;
     void getVehicleLocation(const std::string& plate);
+    void displayTree();
 
     // Operaciones de propietarios
     void addOwner(const Owner& owner);

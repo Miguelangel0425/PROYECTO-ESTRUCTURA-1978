@@ -13,6 +13,12 @@ ParkingSystem::ParkingSystem(int degree) :
     loadData();
 }
 
+
+void ParkingSystem::displayTree() {
+    parkingLayout.displaySpaceTree();  // Llama al método de `ParkingVisualization`
+}
+
+
 void ParkingSystem::loadData() {
     std::ifstream ownersFile("owners.txt");
     std::string line;

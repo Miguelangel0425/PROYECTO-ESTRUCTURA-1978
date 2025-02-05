@@ -3,7 +3,7 @@
 #include <conio.h>
 #include "InteractiveMenu.h"
 #include "Validaciones.h"
-
+#include "ParkingVisualization.h"
 // Add missing display functions
 void displayVehicle(const Vehicle& vehicle) {
     std::cout << "Placa: " << vehicle.plate << "\n"
@@ -28,6 +28,7 @@ int main() {
         "\033[1;33mRegistrar Entrada\033[0m",      
         "\033[1;33mRegistrar Salida\033[0m", 
         "\033[1;33mGrafica del Parquedero\033[0m",  // Nueva opción
+        "\033[1;33mArbol de Parqueadero\033[0m", 
         "\033[1;33mEncontrar ubicacion del vehiculo\033[0m",   // Nueva opción      
         "\033[1;33mLista de Propietarios\033[0m", 
         "\033[1;33mLista de Vehiculos\033[0m",
@@ -279,8 +280,13 @@ int main() {
                 case 4: { // Display Parking Layout
                         system.displayParkingLayout();
                         break;
-                    }   
-                case 5: { // Find Vehicle Location
+                    }
+                case 5: { // Display Parking Tree
+                    system.displayTree();
+                    break;
+                    }
+
+                case 6: { // Find Vehicle Location
                     if (system.getVehicleCount() == 0) {
                         std::cout << "\033[31mNo hay vehiculos registrados. No se puede realizar la operacion.\033[0m" << std::endl;
                         break;
@@ -296,7 +302,7 @@ int main() {
                     system.getVehicleLocation(vehicle.plate);
                     break;
                 }         
-                case 6: {
+                case 7: {
                     bool hasOwners = false;
                     system.displayAllOwners([&](const Owner& owner) {
                         hasOwners = true;
@@ -310,7 +316,7 @@ int main() {
                     }
                     break;
                 }
-                case 7: {
+                case 8: {
                     bool hasVehicles = false;
                     system.displayAllVehicles([&](const Vehicle& vehicle) {
                         hasVehicles = true;
@@ -321,7 +327,7 @@ int main() {
                     }
                     break;
                 }
-                case 8: {
+                case 9: {
                     bool hasRecords = false;
                     system.displayAllRecords([&](const ParkingRecord& record) {
                         hasRecords = true;
@@ -332,7 +338,7 @@ int main() {
                     }
                     break;
                 }
-                case 9: { // Advanced Search
+                case 10: { // Advanced Search
                     if (system.getVehicleCount() == 0) {
                         std::cout << "\033[31mNo hay vehiculos registrados. No se puede realizar la operacion.\033[0m" << std::endl;
                         break;
@@ -458,7 +464,7 @@ int main() {
                     }
                     break;
                 }
-                case 10: {
+                case 11: {
                     if (system.getVehicleCount() == 0) {
                         std::cout << "\033[31mNo hay vehiculos registrados. No se puede realizar la operacion.\033[0m" << std::endl;
                         break;
@@ -650,7 +656,7 @@ int main() {
             break;   
                 };
 
-                case 11: {
+                case 12: {
                     if (system.getVehicleCount() == 0) {
                         std::cout << "\033[31mNo hay vehiculos registrados. No se puede realizar la operacion.\033[0m" << std::endl;
                         break;
@@ -709,11 +715,11 @@ int main() {
                     break;
                 } 
 
-                case 12: // Exit
+                case 13: // Exit
                     return 0;
             }
         
-            if (choice != 12) {
+            if (choice != 13) {
                 std::cout << "\nPress any key to continue...";
                 _getch();
             }
