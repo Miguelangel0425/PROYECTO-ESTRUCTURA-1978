@@ -1,0 +1,261 @@
+Paso 1:
+Colocando reina en posición (1,1)
+Q . . . . . 
+. . . . . . 
+. . . . . . 
+. . . . . . 
+. . . . . . 
+. . . . . . 
+
+Paso 2:
+Colocando reina en posición (3,2)
+Q . . . . . 
+. . . . . . 
+. Q . . . . 
+. . . . . . 
+. . . . . . 
+. . . . . . 
+
+Paso 3:
+Colocando reina en posición (5,3)
+Q . . . . . 
+. . . . . . 
+. Q . . . . 
+. . . . . . 
+. . Q . . . 
+. . . . . . 
+
+Paso 4:
+Colocando reina en posición (2,4)
+Q . . . . . 
+. . . Q . . 
+. Q . . . . 
+. . . . . . 
+. . Q . . . 
+. . . . . . 
+
+Paso 5:
+Colocando reina en posición (4,5)
+Q . . . . . 
+. . . Q . . 
+. Q . . . . 
+. . . . Q . 
+. . Q . . . 
+. . . . . . 
+
+Paso 6: Retrocediendo - removiendo reina de (4,5)
+
+Paso 7: Retrocediendo - removiendo reina de (2,4)
+
+Paso 8: Retrocediendo - removiendo reina de (5,3)
+
+Paso 9:
+Colocando reina en posición (6,3)
+Q . . . . . 
+. . . . . . 
+. Q . . . . 
+. . . . . . 
+. . . . . . 
+. . Q . . . 
+
+Paso 10:
+Colocando reina en posición (2,4)
+Q . . . . . 
+. . . Q . . 
+. Q . . . . 
+. . . . . . 
+. . . . . . 
+. . Q . . . 
+
+Paso 11: Retrocediendo - removiendo reina de (2,4)
+
+Paso 12: Retrocediendo - removiendo reina de (6,3)
+
+Paso 13: Retrocediendo - removiendo reina de (3,2)
+
+Paso 14:
+Colocando reina en posición (4,2)
+Q . . . . . 
+. . . . . . 
+. . . . . . 
+. Q . . . . 
+. . . . . . 
+. . . . . . 
+
+Paso 15:
+Colocando reina en posición (2,3)
+Q . . . . . 
+. . Q . . . 
+. . . . . . 
+. Q . . . . 
+. . . . . . 
+. . . . . . 
+
+Paso 16:
+Colocando reina en posición (5,4)
+Q . . . . . 
+. . Q . . . 
+. . . . . . 
+. Q . . . . 
+. . . Q . . 
+. . . . . . 
+
+Paso 17:
+Colocando reina en posición (3,5)
+Q . . . . . 
+. . Q . . . 
+. . . . Q . 
+. Q . . . . 
+. . . Q . . 
+. . . . . . 
+
+Paso 18: Retrocediendo - removiendo reina de (3,5)
+
+Paso 19: Retrocediendo - removiendo reina de (5,4)
+
+Paso 20: Retrocediendo - removiendo reina de (2,3)
+
+Paso 21:
+Colocando reina en posición (6,3)
+Q . . . . . 
+. . . . . . 
+. . . . . . 
+. Q . . . . 
+. . . . . . 
+. . Q . . . 
+
+Paso 22:
+Colocando reina en posición (3,4)
+Q . . . . . 
+. . . . . . 
+. . . Q . . 
+. Q . . . . 
+. . . . . . 
+. . Q . . . 
+
+Paso 23: Retrocediendo - removiendo reina de (3,4)
+
+Paso 24: Retrocediendo - removiendo reina de (6,3)
+
+Paso 25: Retrocediendo - removiendo reina de (4,2)
+
+Paso 26:
+Colocando reina en posición (5,2)
+Q . . . . . 
+. . . . . . 
+. . . . . . 
+. . . . . . 
+. Q . . . . 
+. . . . . . 
+
+Paso 27:
+Colocando reina en posición (2,3)
+Q . . . . . 
+. . Q . . . 
+. . . . . . 
+. . . . . . 
+. Q . . . . 
+. . . . . . 
+
+Paso 28:
+Colocando reina en posición (6,4)
+Q . . . . . 
+. . Q . . . 
+. . . . . . 
+. . . . . . 
+. Q . . . . 
+. . . Q . . 
+
+Paso 29:
+Colocando reina en posición (3,5)
+Q . . . . . 
+. . Q . . . 
+. . . . Q . 
+. . . . . . 
+. Q . . . . 
+. . . Q . . 
+
+Paso 30: Retrocediendo - removiendo reina de (3,5)
+
+Paso 31: Retrocediendo - removiendo reina de (6,4)
+
+Paso 32: Retrocediendo - removiendo reina de (2,3)
+
+Paso 33: Retrocediendo - removiendo reina de (5,2)
+
+Paso 34:
+Colocando reina en posición (6,2)
+Q . . . . . 
+. . . . . . 
+. . . . . . 
+. . . . . . 
+. . . . . . 
+. Q . . . . 
+
+Paso 35:
+Colocando reina en posición (2,3)
+Q . . . . . 
+. . Q . . . 
+. . . . . . 
+. . . . . . 
+. . . . . . 
+. Q . . . . 
+
+Paso 36:
+Colocando reina en posición (5,4)
+Q . . . . . 
+. . Q . . . 
+. . . . . . 
+. . . . . . 
+. . . Q . . 
+. Q . . . . 
+
+Paso 37: Retrocediendo - removiendo reina de (5,4)
+
+Paso 38: Retrocediendo - removiendo reina de (2,3)
+
+Paso 39:
+Colocando reina en posición (4,3)
+Q . . . . . 
+. . . . . . 
+. . . . . . 
+. . Q . . . 
+. . . . . . 
+. Q . . . . 
+
+Paso 40:
+Colocando reina en posición (2,4)
+Q . . . . . 
+. . . Q . . 
+. . . . . . 
+. . Q . . . 
+. . . . . . 
+. Q . . . . 
+
+Paso 41: Retrocediendo - removiendo reina de (2,4)
+
+Paso 42: Retrocediendo - removiendo reina de (4,3)
+
+Paso 43: Retrocediendo - removiendo reina de (6,2)
+
+Paso 44: Retrocediendo - removiendo reina de (1,1)
+
+Paso 45:
+Colocando reina en posición (2,1)
+. . . . . . 
+Q . . . . . 
+. . . . . . 
+. . . . . . 
+. . . . . . 
+. . . . . . 
+
+Paso 46:
+Colocando reina en posición (4,2)
+. . . . . . 
+Q . . . . . 
+. . . . . . 
+. Q . . . . 
+. . . . . . 
+. . . . . . 
+
+Paso 47:
